@@ -1,0 +1,15 @@
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/bin/Debug/net7.0/Eum.Cores.Apple.deps.json
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/bin/Debug/net7.0/Eum.Cores.Apple.dll
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/bin/Debug/net7.0/Eum.Cores.Apple.pdb
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/bin/Debug/net7.0/Eum.Core.dll
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/bin/Debug/net7.0/Eum.Core.pdb
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.csproj.AssemblyReference.cache
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.GeneratedMSBuildEditorConfig.editorconfig
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.AssemblyInfoInputs.cache
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.AssemblyInfo.cs
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.csproj.CoreCompileInputs.cache
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.csproj.CopyComplete
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.dll
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/refint/Eum.Cores.Apple.dll
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/Eum.Cores.Apple.pdb
+/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Cores.Apple/obj/Debug/net7.0/ref/Eum.Cores.Apple.dll

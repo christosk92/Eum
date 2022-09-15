@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "bKGsjx8+hO2W5ySpyZzOaoRtpQA7il8cDC18rAwZDAIJUb+i3JXrdXnKOqmwvcRWdZK118ysevE2eiNcnWh/Ig==",
+  "success": true,
+  "projectFilePath": "/Users/krisk/RiderProjects/Eum.CrossPlatform/src/Eum.Core/Eum.Core.csproj",
+  "expectedPackageFiles": [
+    "/Users/krisk/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/7.0.0-rc.1.22426.10/microsoft.extensions.dependencyinjection.abstractions.7.0.0-rc.1.22426.10.nupkg.sha512"
+  ],
+  "logs": []
+}

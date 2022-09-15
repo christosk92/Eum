@@ -1,0 +1,130 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Spotify/Eum.Cores.Spotify.csproj": {}
+  },
+  "projects": {
+    "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Core/Eum.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Core/Eum.Core.csproj",
+        "projectName": "Eum.Core",
+        "projectPath": "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Core/Eum.Core.csproj",
+        "packagesPath": "/Users/krisk/.nuget/packages/",
+        "outputPath": "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/krisk/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[7.0.0-rc.1.22426.10, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.100-rc.1.22431.12/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Spotify/Eum.Cores.Spotify.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Spotify/Eum.Cores.Spotify.csproj",
+        "projectName": "Eum.Cores.Spotify",
+        "projectPath": "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Spotify/Eum.Cores.Spotify.csproj",
+        "packagesPath": "/Users/krisk/.nuget/packages/",
+        "outputPath": "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Spotify/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/krisk/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Core/Eum.Core.csproj": {
+                "projectPath": "/Users/krisk/RiderProjects/Eum.CrossPlatform/Eum.Cores.Apple/Eum.Core/Eum.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[7.0.0-rc.1.22426.10, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.100-rc.1.22431.12/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
