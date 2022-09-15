@@ -1,4 +1,6 @@
-**//authkey.p8
+**/authkey.p8
 
-**//bin
-**//obj
+**/bin
+**/obj
+
+**/.DS_Store
