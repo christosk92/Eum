@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using Eum.Cores.Apple.Contracts;
+using Eum.Cores.Apple.Contracts.Models;
 using Eum.Cores.Apple.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +9,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Eum.Cores.Apple.Services;
 
-internal sealed class SecretKeyDeveloperTokenService : IDeveloperTokenService
+public sealed class SecretKeyDeveloperTokenService : IDeveloperTokenService
 {
     private DeveloperTokenConfiguration _configuration;
 

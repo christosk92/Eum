@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Eum.Cores.Apple.Contracts;
+using Eum.Cores.Apple.Contracts.Models;
 using Nito.AsyncEx;
 
 namespace Eum.Cores.Apple.Services;
@@ -33,15 +34,16 @@ public sealed class MediaTokenService : IMediaTokenService
         _oAuthHandler.NavigateWebViewTo(getAuthuri, s =>
         {
             mediaAccessToken = s;
+            _cachedMediaToken = new TokenData
+            {
+                ExpiresAt = generatedAt.AddMonths(6),
+                TokenValue = mediaAccessToken
+            };
             waitForToken.Set();
+            return _cachedMediaToken;
         });
 
         await waitForToken.WaitAsync(ct);
-        _cachedMediaToken = new TokenData
-        {
-            ExpiresAt = generatedAt.AddMonths(6),
-            TokenValue = mediaAccessToken
-        };
         return _cachedMediaToken;
     }
 
@@ -54,10 +56,10 @@ public sealed class MediaTokenService : IMediaTokenService
             thirdPartyIconURL = null as string,
             thirdPartyName = "Eum2",
             thirdPartyParameters = null as string,
-            thirdPartyToken = developerToken
+            thirdPartyToken = developerToken.TokenValue
         }));
         var url =
-            $"https://authorize.music.apple.com/woa?a={btoaData}&referrer=http%3A%2F%2Flocalhost%3A9000%2F&app=music&p=subscribe";
+            $"https://authorize.music.apple.com/woa?a={btoaData}&app=music&p=subscribe";
         return new Uri(url);
     }
 

@@ -1,53 +1,78 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eum.Core", "src\Eum.Core\Eum.Core.csproj", "{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.32804.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eum.Core", "src\Eum.Core\Eum.Core.csproj", "{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eum.Cores.Apple", "src\Eum.Cores.Apple\Eum.Cores.Apple.csproj", "{6612FB4B-23CC-40EA-A0A6-109E35203814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eum.Cores.Apple", "src\Eum.Cores.Apple\Eum.Cores.Apple.csproj", "{6612FB4B-23CC-40EA-A0A6-109E35203814}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eum.Cores.Spotify", "src\Eum.Cores.Spotify\Eum.Cores.Spotify.csproj", "{93342366-B1A6-4876-BF4F-3FCD1DE89029}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eum.Cores.Spotify", "src\Eum.Cores.Spotify\Eum.Cores.Spotify.csproj", "{93342366-B1A6-4876-BF4F-3FCD1DE89029}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppleCoreTests", "src\Tests\AppleCoreTests\AppleCoreTests.csproj", "{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTest", "src\Tests\ConsoleTest\ConsoleTest.csproj", "{7A9443BA-5FFD-4FB2-87AB-AF82B46F4D09}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionTest", "src\Tests\DependencyInjectionTest\DependencyInjectionTest.csproj", "{31CA6766-BFCD-43A2-AA07-F9388D2ED662}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppleCoreTests", "src\Tests\AppleCoreTests\AppleCoreTests.csproj", "{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{073975C2-C5BF-4637-BE4C-885904E816B6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eum.Cores.Apple.MSEdge", "src\Eum.Cores.Apple.MSEdge\Eum.Cores.Apple.MSEdge.csproj", "{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eum.Cores.Apple.Contracts", "src\Eum.Cores.Apple.Contracts\Eum.Cores.Apple.Contracts.csproj", "{CEE395BF-F415-438B-A334-FEE936CEDAEB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apple", "Apple", "{815CA2D5-FFA3-48C6-A5F9-512858C1DD98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Core|Any CPU = Core|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}.Core|Any CPU.ActiveCfg = Core|Any CPU
+		{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}.Core|Any CPU.Build.0 = Core|Any CPU
 		{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EB8A912-CC90-46BB-90D7-BFCE4D8CE1EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6612FB4B-23CC-40EA-A0A6-109E35203814}.Core|Any CPU.ActiveCfg = Core|Any CPU
+		{6612FB4B-23CC-40EA-A0A6-109E35203814}.Core|Any CPU.Build.0 = Core|Any CPU
 		{6612FB4B-23CC-40EA-A0A6-109E35203814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6612FB4B-23CC-40EA-A0A6-109E35203814}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6612FB4B-23CC-40EA-A0A6-109E35203814}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6612FB4B-23CC-40EA-A0A6-109E35203814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93342366-B1A6-4876-BF4F-3FCD1DE89029}.Core|Any CPU.ActiveCfg = Core|Any CPU
+		{93342366-B1A6-4876-BF4F-3FCD1DE89029}.Core|Any CPU.Build.0 = Core|Any CPU
 		{93342366-B1A6-4876-BF4F-3FCD1DE89029}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{93342366-B1A6-4876-BF4F-3FCD1DE89029}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93342366-B1A6-4876-BF4F-3FCD1DE89029}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93342366-B1A6-4876-BF4F-3FCD1DE89029}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}.Core|Any CPU.ActiveCfg = Core|Any CPU
+		{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}.Core|Any CPU.Build.0 = Core|Any CPU
 		{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A9443BA-5FFD-4FB2-87AB-AF82B46F4D09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A9443BA-5FFD-4FB2-87AB-AF82B46F4D09}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A9443BA-5FFD-4FB2-87AB-AF82B46F4D09}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A9443BA-5FFD-4FB2-87AB-AF82B46F4D09}.Release|Any CPU.Build.0 = Release|Any CPU
-		{31CA6766-BFCD-43A2-AA07-F9388D2ED662}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{31CA6766-BFCD-43A2-AA07-F9388D2ED662}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{31CA6766-BFCD-43A2-AA07-F9388D2ED662}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{31CA6766-BFCD-43A2-AA07-F9388D2ED662}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79}.Core|Any CPU.ActiveCfg = Release|Any CPU
+		{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79}.Core|Any CPU.Build.0 = Release|Any CPU
+		{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEE395BF-F415-438B-A334-FEE936CEDAEB}.Core|Any CPU.ActiveCfg = Release|Any CPU
+		{CEE395BF-F415-438B-A334-FEE936CEDAEB}.Core|Any CPU.Build.0 = Release|Any CPU
+		{CEE395BF-F415-438B-A334-FEE936CEDAEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEE395BF-F415-438B-A334-FEE936CEDAEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEE395BF-F415-438B-A334-FEE936CEDAEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEE395BF-F415-438B-A334-FEE936CEDAEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{6612FB4B-23CC-40EA-A0A6-109E35203814} = {815CA2D5-FFA3-48C6-A5F9-512858C1DD98}
 		{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9} = {073975C2-C5BF-4637-BE4C-885904E816B6}
-		{7A9443BA-5FFD-4FB2-87AB-AF82B46F4D09} = {073975C2-C5BF-4637-BE4C-885904E816B6}
-		{31CA6766-BFCD-43A2-AA07-F9388D2ED662} = {073975C2-C5BF-4637-BE4C-885904E816B6}
+		{93BFBD1C-1AD3-4016-A2F5-D3F725E51D79} = {815CA2D5-FFA3-48C6-A5F9-512858C1DD98}
+		{CEE395BF-F415-438B-A334-FEE936CEDAEB} = {815CA2D5-FFA3-48C6-A5F9-512858C1DD98}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EF6861F9-21E1-4D20-8853-54E340A27DB3}
 	EndGlobalSection
 EndGlobal

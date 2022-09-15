@@ -1,9 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Eum.Cores.Apple.Contracts.Models.Response.StoreFront;
-using Eum.Cores.Apple.Models;
 
-namespace Eum.Cores.Apple.Helpers;
+namespace Eum.Cores.Apple.Contracts.Helper;
 internal sealed class ExplicitContentPolicyTypeConverter : JsonConverter<ExplicitContentPolicyType>
 {
     public override ExplicitContentPolicyType Read(ref Utf8JsonReader reader, Type typeToConvert,

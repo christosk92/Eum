@@ -1,4 +1,5 @@
 using Eum.Cores.Apple.Contracts;
+using Eum.Cores.Apple.Contracts.Models.Response.StoreFront;
 using Eum.Cores.Apple.Exceptions;
 using Eum.Cores.Apple.Models;
 using Microsoft.Extensions.Options;

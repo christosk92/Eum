@@ -2,6 +2,7 @@ using Eum.Core;
 using Eum.Core.Contracts;
 using Eum.Cores.Apple.Contracts;
 using Eum.Cores.Apple.Models;
+using Eum.Cores.Apple.MSEdge;
 using Eum.Cores.Apple.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -12,7 +13,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAppleMusicCore(this IServiceCollection services,
         DeveloperTokenConfiguration developerTokenConfiguration,
-        IMediaTokenOAuthHandler? mediaTokenOAuthHandler = null)
+        IMediaTokenOAuthHandler withWebviewOauthHandler)
     {
         services.TryAddSingleton<IUnifiedIdsConfiguration, GenericUnifiedIdsConfiguration>();
 
@@ -28,20 +29,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IDeveloperTokenService,
             SecretKeyDeveloperTokenService>();
 
-        if (mediaTokenOAuthHandler != null)
-        {
-            services.AddSingleton(mediaTokenOAuthHandler);
-            services.AddTransient<IMediaTokenService, MediaTokenService>();
-        }
-        else
-            services.AddTransient<IMediaTokenService, EmptyMediaTokenService>();
-
         services.AddSingleton<IClientsProvider, RefitClientsProvider>();
 
         services.AddSingleton<IAppleCore, AppleCore>();
         services.AddTransient<IMusicCore>(provider => provider.GetService<IAppleCore>()!);
         services.AddSingleton<IStoreFrontProvider, LazyStoreFrontsProvider>();
-
+        services.AddSingleton(withWebviewOauthHandler);
         return services;
     }
 }

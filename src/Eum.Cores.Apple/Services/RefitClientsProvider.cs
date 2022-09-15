@@ -7,7 +7,7 @@ using Refit;
 
 namespace Eum.Cores.Apple.Services;
 
-internal sealed class RefitClientsProvider : IClientsProvider
+public sealed class RefitClientsProvider : IClientsProvider
 {
     public RefitClientsProvider(IDeveloperTokenService defaultDeveloperTokenService,
         IMediaTokenService defaultMediaTokenService,
