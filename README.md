@@ -1,7 +1,7 @@
 
 # Eum
 
-A merged & unified music services library for .NET.
+A merged & unified music services library for .NET 6 and up.
 
 For [Apple Music](src/Eum.Cores.Apple) & [Spotify](src/Eum.Cores.Spotify).
 
