@@ -15,9 +15,9 @@ internal sealed class SecretKeyDeveloperTokenService : IDeveloperTokenService
     public SecretKeyDeveloperTokenService(IOptions<DeveloperTokenConfiguration> developerTokenOption)
     {
         _configuration = developerTokenOption.Value;
-        ArgumentException.ThrowIfNullOrEmpty(_configuration.KeyId);
-        ArgumentException.ThrowIfNullOrEmpty(_configuration.TeamId);
-        ArgumentException.ThrowIfNullOrEmpty(_configuration.PathToFile);
+        ArgumentNullException.ThrowIfNull(_configuration.KeyId);
+        ArgumentNullException.ThrowIfNull(_configuration.TeamId);
+        ArgumentNullException.ThrowIfNull(_configuration.PathToFile);
     }
 
     private TokenData? _previousToken;

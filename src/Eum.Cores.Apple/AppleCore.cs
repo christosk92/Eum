@@ -47,12 +47,12 @@ public sealed class AppleCore : IAppleCore
             storeFrontProvider);
     }
 
-    public static IAppleCore WithDeveloperTokenOnly(DeveloperTokenConfiguration configuration,
-        string region)
+    public static IAppleCore WithDeveloperTokenOnly(DeveloperTokenConfiguration configuration)
     {
         IDeveloperTokenService defaultDeveloperTokenService =
             new SecretKeyDeveloperTokenService(new OptionsWrapper<DeveloperTokenConfiguration>(configuration));
-        var storeFrontProvider = new ConstStorefrontProvider(region);
+        var storeFrontProvider = new ConstStorefrontProvider(configuration.DefaultStorefrontId ?? 
+                                                             throw new InvalidOperationException("DefaultStoreFrontId cannot be null"));
 
         return new AppleCore(defaultDeveloperTokenService, new EmptyMediaTokenService(),
             new RefitClientsProvider(defaultDeveloperTokenService,
