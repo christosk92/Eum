@@ -16,8 +16,6 @@ namespace Eum.Cores.Apple;
 public sealed class AppleCore : IAppleCore
 {
     private readonly ITokenValidationFactory _bearerTokenValidatorFactory;
-    private readonly IDeveloperTokenService _developerTokenService;
-    private readonly IMediaTokenService _mediaTokenService;
     public AppleCore(
         IDeveloperTokenService developerTokenService,
         IMediaTokenService mediaTokenService, 
@@ -25,12 +23,14 @@ public sealed class AppleCore : IAppleCore
         IStoreFrontProvider storeFrontProvider,
         ITokenValidationFactory bearerTokenValidatorFactory)
     {
-        _developerTokenService = developerTokenService;
-        _mediaTokenService = mediaTokenService;
+        DeveloperTokenService = developerTokenService;
+        MediaTokenService = mediaTokenService;
         Clients = clientsProvider;
         StoreFrontProvider = storeFrontProvider;
         _bearerTokenValidatorFactory = bearerTokenValidatorFactory;
-    }
+    }   
+    public IDeveloperTokenService DeveloperTokenService { get; }
+    public IMediaTokenService MediaTokenService { get; }
     public IClientsProvider Clients { get; }
 
     public static IAppleCore Create(DeveloperTokenConfiguration tokenConfiguration,
@@ -56,43 +56,32 @@ public sealed class AppleCore : IAppleCore
 
 
     public CoreType Type => CoreType.Apple;
-
-    public bool IsAuthenticated
-    {
-        get
-        {
-            var developerToken = _tokens
-                .FirstOrDefault(a => a.Key == TokenType.DeveloperToken)
-                .Value;
-            var hasExpired = developerToken?.HasExpired ?? true;
-            return !hasExpired;
-        }
-    }
-    public async ValueTask<bool> AuthenticateAsync(CancellationToken ct = default)
-    {
-       //The tactic is to first get a developer token, because media token requires a developer token
-       //And we validate each of them individually.
-       var getDeveloperToken = IsAuthenticated
-           ? _tokens[TokenType.DeveloperToken]
-           : await _developerTokenService.GetDeveloperTokenAsync(ct);
-
-       var bearerTokenValidator = _bearerTokenValidatorFactory.GetTokenValidation();
-       if (await bearerTokenValidator.ValidateDeveloperTokenAsync(getDeveloperToken.TokenValue, ct))
-           _tokens[TokenType.DeveloperToken] = getDeveloperToken;
-       else return false;
-
-       var mediaToken = _tokens.ContainsKey(TokenType.MediaToken)
-                        && _tokens[TokenType.MediaToken].HasExpired == false
-           ? _tokens[TokenType.MediaToken]
-           : await _mediaTokenService.GetMediaTokenAsync(ct);
-       if (mediaToken != null)
-       {
-           if (await bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue,  mediaToken.TokenValue, ct))
-               _tokens[TokenType.MediaToken] = mediaToken;
-       }
-
-       return true;
-    }
+    
+    // public async ValueTask<bool> AuthenticateAsync(CancellationToken ct = default)
+    // {
+    //    //The tactic is to first get a developer token, because media token requires a developer token
+    //    //And we validate each of them individually.
+    //    var getDeveloperToken = IsAuthenticated
+    //        ? _tokens[TokenType.DeveloperToken]
+    //        : await _developerTokenService.GetDeveloperTokenAsync(ct);
+    //
+    //    var bearerTokenValidator = _bearerTokenValidatorFactory.GetTokenValidation();
+    //    if (await bearerTokenValidator.ValidateDeveloperTokenAsync(getDeveloperToken.TokenValue, ct))
+    //        _tokens[TokenType.DeveloperToken] = getDeveloperToken;
+    //    else return false;
+    //
+    //    var mediaToken = _tokens.ContainsKey(TokenType.MediaToken)
+    //                     && _tokens[TokenType.MediaToken].HasExpired == false
+    //        ? _tokens[TokenType.MediaToken]
+    //        : await _mediaTokenService.GetMediaTokenAsync(ct);
+    //    if (mediaToken != null)
+    //    {
+    //        if (await bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue,  mediaToken.TokenValue, ct))
+    //            _tokens[TokenType.MediaToken] = mediaToken;
+    //    }
+    //
+    //    return true;
+    // }
 
     // public async ValueTask<bool> AuthenticateAsync(TokenData mediaAccessToken, CancellationToken ct = default)
     // {
@@ -159,9 +148,6 @@ public sealed class AppleCore : IAppleCore
     }
 
     public IStoreFrontProvider StoreFrontProvider { get; }
-    public IReadOnlyDictionary<TokenType, TokenData> Tokens => _tokens;
-
-    private readonly ConcurrentDictionary<TokenType, TokenData> _tokens = new();
 }
 
 public sealed class TokenValidationFactory : ITokenValidationFactory

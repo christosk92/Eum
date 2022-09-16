@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Eum.Cores.Spotify.Contracts\Eum.Cores.Spotify.Contracts.csproj" />
       <ProjectReference Include="..\Eum.Core\Eum.Core.csproj" />
     </ItemGroup>
 

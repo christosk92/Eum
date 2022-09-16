@@ -48,6 +48,7 @@ public static class ServiceCollectionExtensions
 public interface IAppleMusicCoreBuilderWithOAuthHandler
 {
     IServiceCollection WithMSEdge();
+    IServiceCollection WithChrome();
 
     IServiceCollection WithMediaToken(string mediaToken);
 
@@ -62,6 +63,12 @@ internal struct T2 : IAppleMusicCoreBuilderWithOAuthHandler
         Collection.AddTransient<IMediaTokenOAuthHandler>(_ => new EdgeAuthHandler());
         return Collection;
     }
+
+    public IServiceCollection WithChrome()
+    {
+        Collection.AddTransient<IMediaTokenOAuthHandler>(_ => new ChromeAuthHandler());
+        return Collection;    }
+
     public IServiceCollection WithMediaToken(
         string mediaToken)
     {

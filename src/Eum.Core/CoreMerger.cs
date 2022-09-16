@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Design;
 using Eum.Core.Contracts;
+using Eum.Core.Contracts.Models;
 using Eum.Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,6 +31,17 @@ public static class CoreMerger
 
         return newMergedCore;
     }
+    public static IMergedCore MergeCores(
+        params IMusicCore[] cores)
+    {
+        var newMergedCore = new MergedCore(new GenericUnifiedIdsConfiguration())
+        {
+            Cores = cores
+                .ToDictionary(a => a.Type, a => a)
+        };
+
+        return newMergedCore;
+    }
 }
 
 internal record MergedCore : IMergedCore
@@ -43,23 +55,30 @@ internal record MergedCore : IMergedCore
 
     public IReadOnlyDictionary<CoreType, IMusicCore> Cores { get; init; }
 
-    public async Task<IReadOnlyDictionary<CoreType, CoreSearchedResponse>> 
+    public async Task<IReadOnlyDictionary<CoreType, ICoreSearchResponse>> 
         SearchAsync(string query,
         CancellationToken ct = default)
     {
         var searchAlCoresAsync = Cores
             .Select(async a =>
             {
-                var searchedData = await a.Value
-                    .SearchAsync(query, ct);
+                try
+                {
+                    var searchedData = await a.Value
+                        .SearchAsync(query, ct);
 
-                return (a.Key, searchedData);
+                    return (a.Key, searchedData);
+                }
+                catch (Exception x)
+                {
+                    return (a.Key, new ExceptionSearch(x) as ICoreSearchResponse);
+                }
             });
 
         var searchedData = await Task.WhenAll(searchAlCoresAsync);
 
         return searchedData
-            .ToDictionary(a => a.Key, a => a.searchedData);
+            .ToDictionary(a => a.Key, a => a.Item2);
     }
 
     public IReadOnlyList<IReadOnlyDictionary<CoreType, string>> MergeIds(CoreId one, CoreId two)
@@ -79,4 +98,15 @@ internal record MergedCore : IMergedCore
     {
         _unifiedIdsConfiguration.MergeId(one, two);
     }
+}
+
+internal class ExceptionSearch : ICoreSearchResponse
+{
+    public ExceptionSearch(Exception exception)
+    {
+        Exception = exception;
+    }
+
+    public Exception Exception { get; }
+    public bool IsError => true;
 }

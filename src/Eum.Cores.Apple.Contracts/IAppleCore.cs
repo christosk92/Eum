@@ -11,8 +11,8 @@ namespace Eum.Cores.Apple.Contracts;
 /// </summary>
 public interface IAppleCore : IMusicCore
 {
+    IMediaTokenService MediaTokenService { get; }
+    IDeveloperTokenService DeveloperTokenService { get; }
     IStoreFrontProvider StoreFrontProvider { get; }
-    IReadOnlyDictionary<TokenType, TokenData> Tokens { get; }
-
     IClientsProvider Clients { get; }
 }
