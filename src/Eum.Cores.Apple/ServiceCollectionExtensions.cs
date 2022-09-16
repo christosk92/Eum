@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         IMediaTokenOAuthHandler withWebviewOauthHandler)
     {
         services.TryAddSingleton<IUnifiedIdsConfiguration, GenericUnifiedIdsConfiguration>();
-
+        services.AddHttpClient();
         services.AddOptions<DeveloperTokenConfiguration>()
             .Configure(configuration =>
             {

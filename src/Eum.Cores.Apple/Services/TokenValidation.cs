@@ -5,27 +5,34 @@ using System.Net.Http.Headers;
 
 namespace Eum.Cores.Apple.Services
 {
-    internal sealed class TokenValidation : ITokenValidation
+    public sealed class TokenValidation : ITokenValidation
     {
-        private static HttpClient _httpClient = new HttpClient();
-        public async Task<bool> ValidateMediaTokenAsync(
+        private readonly HttpClient _httpClient;
+        public TokenValidation(HttpClient httpClientFactory)
+        {
+            _httpClient = httpClientFactory;
+        }
+        public Task<bool> ValidateMediaTokenAsync(
             string developerToken,
             string accessToken, CancellationToken ct = default)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", developerToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", 
+                developerToken);
             _httpClient.DefaultRequestHeaders.Add("media-user-token", accessToken);
 
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task<bool> ValidateDeveloperTokenAsync(string developerToken, CancellationToken ct = default)
-        {    
+        {      
             //https://api.music.apple.com/v1/storefronts
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", developerToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new
+                AuthenticationHeaderValue("Bearer", developerToken);
             try
             {
-                _ =
+                var t = 
                     await _httpClient.GetAsync("https://api.music.apple.com/v1/storefronts", ct);
+                t.EnsureSuccessStatusCode();
                 return true;
             }
             catch (HttpRequestException requestException)

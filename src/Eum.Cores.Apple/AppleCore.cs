@@ -3,6 +3,7 @@ using System.Security.Authentication;
 using Eum.Core.Contracts;
 using Eum.Core.Models;
 using Eum.Cores.Apple.Contracts;
+using Eum.Cores.Apple.Contracts.Factory;
 using Eum.Cores.Apple.Contracts.Models;
 using Eum.Cores.Apple.Contracts.Models.Request;
 using Eum.Cores.Apple.Models;
@@ -14,20 +15,20 @@ namespace Eum.Cores.Apple;
 
 public sealed class AppleCore : IAppleCore
 {
-    private readonly ITokenValidation _bearerTokenValidator;
+    private readonly ITokenValidationFactory _bearerTokenValidatorFactory;
     private readonly IDeveloperTokenService _developerTokenService;
     private readonly IMediaTokenService _mediaTokenService;
     public AppleCore(
         IDeveloperTokenService developerTokenService,
         IMediaTokenService mediaTokenService, 
         IClientsProvider clientsProvider,
-        IStoreFrontProvider storeFrontProvider, ITokenValidation bearerTokenValidator)
+        IStoreFrontProvider storeFrontProvider, ITokenValidationFactory bearerTokenValidatorFactory)
     {
         _developerTokenService = developerTokenService;
         _mediaTokenService = mediaTokenService;
         Clients = clientsProvider;
         StoreFrontProvider = storeFrontProvider;
-        _bearerTokenValidator = bearerTokenValidator;
+        _bearerTokenValidatorFactory = bearerTokenValidatorFactory;
     }
     public IClientsProvider Clients { get; }
 
@@ -48,7 +49,7 @@ public sealed class AppleCore : IAppleCore
                 defaultMediaTokenService,
                 lazyStorefrontProvider),
             lazyStorefrontProvider,
-            new TokenValidation());
+            new TokenValidationFactory(new HttpClient()));
     }
 
 
@@ -73,8 +74,8 @@ public sealed class AppleCore : IAppleCore
            ? _tokens[TokenType.DeveloperToken]
            : await _developerTokenService.GetDeveloperTokenAsync(ct);
 
-
-       if (await _bearerTokenValidator.ValidateDeveloperTokenAsync(getDeveloperToken.TokenValue, ct))
+       var bearerTokenValidator = _bearerTokenValidatorFactory.GetTokenValidation();
+       if (await bearerTokenValidator.ValidateDeveloperTokenAsync(getDeveloperToken.TokenValue, ct))
            _tokens[TokenType.DeveloperToken] = getDeveloperToken;
        else return false;
 
@@ -84,7 +85,7 @@ public sealed class AppleCore : IAppleCore
            : await _mediaTokenService.GetMediaTokenAsync(ct);
        if (mediaToken != null)
        {
-           if (await _bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue,  mediaToken.TokenValue, ct))
+           if (await bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue,  mediaToken.TokenValue, ct))
                _tokens[TokenType.MediaToken] = mediaToken;
        }
 
@@ -98,12 +99,12 @@ public sealed class AppleCore : IAppleCore
         var getDeveloperToken = IsAuthenticated
             ? _tokens[TokenType.DeveloperToken]
             : await _developerTokenService.GetDeveloperTokenAsync(ct);
-
-        if (await _bearerTokenValidator.ValidateDeveloperTokenAsync(getDeveloperToken.TokenValue, ct))
+        var bearerTokenValidator = _bearerTokenValidatorFactory.GetTokenValidation();
+        if (await bearerTokenValidator.ValidateDeveloperTokenAsync(getDeveloperToken.TokenValue, ct))
             _tokens[TokenType.DeveloperToken] = getDeveloperToken;
         else return false;
 
-        if (await _bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue, 
+        if (await bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue, 
                 mediaAccessToken.TokenValue, ct))
             _tokens[TokenType.MediaToken] = mediaAccessToken;
         else
@@ -112,7 +113,7 @@ public sealed class AppleCore : IAppleCore
                 = await _mediaTokenService.GetMediaTokenAsync(ct);
             if (newToken != null)
             {
-                if (await _bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue, 
+                if (await bearerTokenValidator.ValidateMediaTokenAsync(getDeveloperToken.TokenValue, 
                         mediaAccessToken.TokenValue, ct))
                     _tokens[TokenType.MediaToken] = newToken;
             }
@@ -159,4 +160,17 @@ public sealed class AppleCore : IAppleCore
     public IReadOnlyDictionary<TokenType, TokenData> Tokens => _tokens;
 
     private readonly ConcurrentDictionary<TokenType, TokenData> _tokens = new();
+}
+
+public sealed class TokenValidationFactory : ITokenValidationFactory
+{
+    private readonly HttpClient _httpClient;
+    public TokenValidationFactory(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+    public ITokenValidation GetTokenValidation()
+    {
+        return new TokenValidation(_httpClient);
+    }
 }
