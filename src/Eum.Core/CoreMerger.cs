@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Eum.Core;
 
-public static class CoreMerger 
+public static class CoreMerger
 {
     public static IServiceCollection MergeCores(this IServiceCollection services)
     {
@@ -14,12 +14,12 @@ public static class CoreMerger
         {
             var getAllCores = provider.GetServices<IMusicCore>();
             return MergeCores(provider.GetService<IUnifiedIdsConfiguration>()
-                ?? new GenericUnifiedIdsConfiguration(),
+                              ?? new GenericUnifiedIdsConfiguration(),
                 getAllCores.ToArray());
         });
         return services;
     }
-    
+
     public static IMergedCore MergeCores(IUnifiedIdsConfiguration unifiedIdsConfiguration,
         params IMusicCore[] cores)
     {
@@ -31,6 +31,7 @@ public static class CoreMerger
 
         return newMergedCore;
     }
+
     public static IMergedCore MergeCores(
         params IMusicCore[] cores)
     {
@@ -55,11 +56,19 @@ internal record MergedCore : IMergedCore
 
     public IReadOnlyDictionary<CoreType, IMusicCore> Cores { get; init; }
 
-    public async Task<IReadOnlyDictionary<CoreType, ICoreSearchResponse>> 
+    public async Task<IReadOnlyDictionary<CoreType, ICoreResponse>>
         SearchAsync(string query,
-        CancellationToken ct = default)
+            CoreType[]? cores = null,
+            CancellationToken ct = default)
     {
+        cores ??= new[]
+        {
+            CoreType.Apple,
+            CoreType.Local,
+            CoreType.Spotify
+        };
         var searchAlCoresAsync = Cores
+            .Where(a=> cores.Contains(a.Key))
             .Select(async a =>
             {
                 try
@@ -71,7 +80,51 @@ internal record MergedCore : IMergedCore
                 }
                 catch (Exception x)
                 {
-                    return (a.Key, new ExceptionSearch(x) as ICoreSearchResponse);
+                    return (a.Key, new CoreExceptionWrapper(x) as ICoreResponse);
+                }
+            });
+
+        var searchedData = await Task.WhenAll(searchAlCoresAsync);
+
+        return searchedData
+            .ToDictionary(a => a.Key, a => a.Item2);
+    }
+
+    public async Task<IReadOnlyDictionary<CoreType, ICoreResponse>> GetArtist(CoreId id, CoreType[]? cores = null,
+        CancellationToken ct = default)
+    { 
+        cores ??= new[]
+        {
+            CoreType.Apple,
+            CoreType.Local,
+            CoreType.Spotify
+        };
+        
+        var searchAlCoresAsync = Cores
+            .Where(a=> cores.Contains(a.Key))
+            .Select(async a =>
+            {
+                try
+                {
+                    var idToLookup = new KeyValuePair<CoreType,string>(id.Type, id.Id);
+                    if (a.Key != id.Type)
+                    {
+                        idToLookup = _unifiedIdsConfiguration.GetIds(id)
+                            .First(j => j.Key == a.Key);
+                    }
+                    
+                    var artist = await a.Value
+                        .GetArtistAsync(idToLookup.Value, ct);
+
+                    return (a.Key, artist);
+                }
+                catch (InvalidOperationException)
+                {
+                    return (a.Key, new CoreExceptionWrapper(new CouldNotFindMergedIdException()));
+                }
+                catch (Exception x)
+                {
+                    return (a.Key, new CoreExceptionWrapper(x) as ICoreResponse);
                 }
             });
 
@@ -85,7 +138,7 @@ internal record MergedCore : IMergedCore
     {
         _unifiedIdsConfiguration.MergeId(one, two);
 
-        var one_l=  _unifiedIdsConfiguration
+        var one_l = _unifiedIdsConfiguration
             .GetIds(one);
         var two_l = _unifiedIdsConfiguration.GetIds(two);
         return new[]
@@ -94,15 +147,20 @@ internal record MergedCore : IMergedCore
             two_l
         };
     }
+
     public void MergeIds_AndForget(CoreId one, CoreId two)
     {
         _unifiedIdsConfiguration.MergeId(one, two);
     }
 }
 
-internal class ExceptionSearch : ICoreSearchResponse
+public class CouldNotFindMergedIdException : Exception
 {
-    public ExceptionSearch(Exception exception)
+}
+
+internal class CoreExceptionWrapper : ICoreResponse
+{
+    public CoreExceptionWrapper(Exception exception)
     {
         Exception = exception;
     }
@@ -110,3 +168,4 @@ internal class ExceptionSearch : ICoreSearchResponse
     public Exception Exception { get; }
     public bool IsError => true;
 }
+

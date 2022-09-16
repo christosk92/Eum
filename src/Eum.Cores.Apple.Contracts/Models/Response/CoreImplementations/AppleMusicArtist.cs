@@ -109,4 +109,6 @@ public sealed class AppleMusicArtist : IArtist
             init;
         } = null!;
     }
+
+    public bool IsError => false;
 }

@@ -1,8 +1,6 @@
-using Eum.Core.Contracts.Models;
+namespace Eum.Core.Contracts.Models;
 
-namespace Eum.Core.Contracts;
-
-public interface IArtist
+public interface IArtist : ICoreResponse
 {
     /// <summary>
     /// (Required) The identifier for the artist.

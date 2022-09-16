@@ -20,5 +20,8 @@
       <None Update="chromedriver">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="authkey.p8">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 </Project>

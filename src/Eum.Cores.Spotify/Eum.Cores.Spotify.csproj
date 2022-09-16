@@ -9,12 +9,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Google.Protobuf" Version="3.21.6" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0-rc.1.22426.10" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Eum.Cores.Spotify.Contracts\Eum.Cores.Spotify.Contracts.csproj" />
       <ProjectReference Include="..\Eum.Core\Eum.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Constants" />
     </ItemGroup>
 
 </Project>

@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionExample"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eum.Cores.Spotify.Contracts", "src\Eum.Cores.Spotify.Contracts\Eum.Cores.Spotify.Contracts.csproj", "{05DACA52-5C18-4667-8E22-4CC1DAAD979B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyCoreTests", "src\Tests\SpotifyCoreTests\SpotifyCoreTests.csproj", "{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Core|Any CPU = Core|Any CPU
@@ -82,6 +84,12 @@ Global
 		{05DACA52-5C18-4667-8E22-4CC1DAAD979B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05DACA52-5C18-4667-8E22-4CC1DAAD979B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05DACA52-5C18-4667-8E22-4CC1DAAD979B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}.Core|Any CPU.ActiveCfg = Debug|Any CPU
+		{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}.Core|Any CPU.Build.0 = Debug|Any CPU
+		{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +102,7 @@ Global
 		{93342366-B1A6-4876-BF4F-3FCD1DE89029} = {1007FF63-25C1-4565-8CE1-D5AA3CBE7DD0}
 		{5CB2AA0B-2736-4974-8AC4-9E8CC85ECF19} = {C1549D49-DF0A-4912-ADBF-4895BBEEA3B3}
 		{05DACA52-5C18-4667-8E22-4CC1DAAD979B} = {1007FF63-25C1-4565-8CE1-D5AA3CBE7DD0}
+		{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1} = {073975C2-C5BF-4637-BE4C-885904E816B6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EF6861F9-21E1-4D20-8853-54E340A27DB3}

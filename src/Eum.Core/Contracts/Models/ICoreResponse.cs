@@ -1,6 +1,6 @@
 namespace Eum.Core.Contracts.Models;
 
-public interface ICoreSearchResponse
+public interface ICoreResponse
 {
     bool IsError { get; }
 }

@@ -7,8 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Google.Protobuf" Version="3.21.6" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Eum.Core\Eum.Core.csproj" />
-      <ProjectReference Include="..\src\Eum.Core\Eum.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Enums" />
+      <Folder Include="Models" />
     </ItemGroup>
 
 </Project>

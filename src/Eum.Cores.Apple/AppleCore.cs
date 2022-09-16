@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Authentication;
 using Eum.Core.Contracts;
+using Eum.Core.Contracts.Models;
 using Eum.Core.Models;
 using Eum.Cores.Apple.Contracts;
 using Eum.Cores.Apple.Contracts.Factory;

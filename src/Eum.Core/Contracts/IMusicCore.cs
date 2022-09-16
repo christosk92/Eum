@@ -1,3 +1,4 @@
+using Eum.Core.Contracts.Models;
 using Eum.Core.Models;
 
 namespace Eum.Core.Contracts;
