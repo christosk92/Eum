@@ -11,10 +11,12 @@ namespace Eum.Cores.Apple.Services;
 
 public sealed class SecretKeyDeveloperTokenService : IDeveloperTokenService
 {
+    private readonly ISecretTokenFileProvider _secretTokenFileProvider;
     private DeveloperTokenConfiguration _configuration;
 
-    public SecretKeyDeveloperTokenService(IOptions<DeveloperTokenConfiguration> developerTokenOption)
+    public SecretKeyDeveloperTokenService(IOptions<DeveloperTokenConfiguration> developerTokenOption, ISecretTokenFileProvider secretTokenFileProvider)
     {
+        _secretTokenFileProvider = secretTokenFileProvider;
         _configuration = developerTokenOption.Value;
         ArgumentNullException.ThrowIfNull(_configuration.KeyId);
         ArgumentNullException.ThrowIfNull(_configuration.TeamId);
@@ -48,7 +50,7 @@ public sealed class SecretKeyDeveloperTokenService : IDeveloperTokenService
 
     private ECDsa GetECDsa()
     {
-        using TextReader reader = System.IO.File.OpenText(_configuration.PathToFile!);
+        using var reader = _secretTokenFileProvider.GetTextReaderForFile(_configuration.PathToFile);
         // var ecPrivateKeyParameters =
         //     (ECPrivateKeyParameters)new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
         // var x = ecPrivateKeyParameters.Parameters.G.AffineXCoord.GetEncoded();
@@ -58,16 +60,26 @@ public sealed class SecretKeyDeveloperTokenService : IDeveloperTokenService
         // // Convert the BouncyCastle key to a Native Key.
         // var msEcp = new ECParameters { Curve = ECCurve.NamedCurves.nistP256, Q = { X = x, Y = y }, D = d };
         // return ECDsa.Create(msEcp);
-        var ecPrivateKeyParameters =
-            (ECPrivateKeyParameters)new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
-        var q = ecPrivateKeyParameters.Parameters.G.Multiply(ecPrivateKeyParameters.D).Normalize();
-        var x = q.AffineXCoord.GetEncoded();
-        var y = q.AffineYCoord.GetEncoded();
-        var d = ecPrivateKeyParameters.D.ToByteArrayUnsigned();
-        // Convert the BouncyCastle key to a Native Key.
-        var msEcp = new ECParameters { Curve = ECCurve.NamedCurves.nistP256, Q = { X = x, Y = y }, D = d };
-        return ECDsa.Create(msEcp);
-    }
+
+        try
+        {
+            var ecPrivateKeyParameters =
+                (ECPrivateKeyParameters)new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
+
+            if (ecPrivateKeyParameters == null) throw new InvalidCertificateException();
+            var q = ecPrivateKeyParameters.Parameters.G.Multiply(ecPrivateKeyParameters.D).Normalize();
+            var x = q.AffineXCoord.GetEncoded();
+            var y = q.AffineYCoord.GetEncoded();
+            var d = ecPrivateKeyParameters.D.ToByteArrayUnsigned();
+            // Convert the BouncyCastle key to a Native Key.
+            var msEcp = new ECParameters { Curve = ECCurve.NamedCurves.nistP256, Q = { X = x, Y = y }, D = d };
+            return ECDsa.Create(msEcp);
+        }
+        catch(InvalidCastException)
+        {
+            throw new InvalidCertificateException();
+        }
+}
 
     private string CreateJwt(ECDsa key, string keyId, string teamId)
     {
@@ -84,5 +96,22 @@ public sealed class SecretKeyDeveloperTokenService : IDeveloperTokenService
         var handler = new JwtSecurityTokenHandler();
         var encodedToken = handler.CreateEncodedJwt(descriptor);
         return encodedToken;
+    }
+}
+
+public  sealed class InvalidCertificateException : Exception
+{
+}
+
+public interface ISecretTokenFileProvider
+{
+    TextReader GetTextReaderForFile(string path);
+}
+
+public sealed class DefaultFileStreamTokenProvider : ISecretTokenFileProvider
+{
+    public TextReader GetTextReaderForFile(string path)
+    {
+        return new StreamReader(File.OpenRead(path));
     }
 }

@@ -15,8 +15,4 @@ public interface IAppleCore : IMusicCore
     IReadOnlyDictionary<TokenType, TokenData> Tokens { get; }
 
     IClientsProvider Clients { get; }
-
-    ValueTask<bool> AuthenticateAsync(TokenData mediaAccessToken,
-        CancellationToken ct = default);
-
 }
