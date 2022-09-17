@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Eum.Cores.Spotify.Contracts;
 
 namespace Eum.Cores.Spotify.Crypto;
 
@@ -29,7 +30,7 @@ public static class Integer
     }
 }
 
-public class Shannon : object
+public class Shannon : object, IShannon
 {
     private const int N = 16;
     private const int FOLD = 16;

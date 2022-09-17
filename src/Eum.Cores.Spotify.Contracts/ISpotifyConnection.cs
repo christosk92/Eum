@@ -8,6 +8,19 @@ public interface ISpotifyConnection : IDisposable
     bool IsAlive { get; }
     bool IsAuthenticated { get; }
     
+    
+    Task<(APResponseMessage apResponseMessage, byte[] sharedKey, MemoryStream accumulator)> HandshakeAsync(
+        CancellationToken ct = default);
+    Task<(IShannon ReceiveCipher, IShannon SendCipher)> SolveChallengeAsync(
+        APResponseMessage responseMessage,
+        byte[] sharedKey,
+        MemoryStream accumulator,
+        CancellationToken ct = default);
+
+    Task<APWelcome> AuthenticateAsync(
+        LoginCredentials loginCredentials,
+        CancellationToken ct = default);
+
     /// <summary>
     ///     Opens a TCP connection to spotify and connects but does not authenticate.
     /// </summary>
@@ -23,6 +36,6 @@ public interface ISpotifyConnection : IDisposable
     ///     Thrown when bad data is returned from Spotify.
     ///     This usually means something went wrong in the connection and a new one has to be established.
     Task InstantiateConnectionAsync(CancellationToken ct = default);
-
-    Task<APWelcome> AuthenticateAsync(LoginCredentials loginCredentials, CancellationToken ct = default);
+    
+    // Task<APWelcome> AuthenticateAsync(LoginCredentials loginCredentials, CancellationToken ct = default);
 }

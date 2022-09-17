@@ -1,6 +1,8 @@
-﻿using Eum.Core.Contracts;
+﻿using System.Net.Sockets;
+using Eum.Core.Contracts;
 using Eum.Core.Contracts.Models;
 using Eum.Core.Models;
+using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Factories;
 using Eum.Cores.Spotify.Services;
@@ -38,10 +40,11 @@ public sealed class SpotifyCore : ISpotifyCore
     {
         var defaultConnectionProvider =
             new SpotifyTcpConnectionProvider(new LoginCredentialsProvider(username, password),
-                new SpotifyTcpConnectionFactory());
+                new SpotifyTcpConnectionFactory(new ApResolver(new HttpClient())));
         return new SpotifyCore(defaultConnectionProvider);
     }
 }
+
 
 public class SpotifyArtist : IArtist
 {
