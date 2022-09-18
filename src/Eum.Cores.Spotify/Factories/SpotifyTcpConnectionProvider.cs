@@ -21,8 +21,8 @@ public sealed class SpotifyTcpConnectionProvider : ISpotifyConnectionProvider
             return _previousConnection.connection;
         }
         
-        var newConnection = _spotifyConnectionFactory.GetNewConnection();
-        await newConnection.InstantiateConnectionAsync(ct);
+        var newConnection = _spotifyConnectionFactory.GetNewConnection()
+        await newConnection.HandshakeAsync(ct);
         await newConnection.AuthenticateAsync(credentials, ct);
         _previousConnection = new _t
         {

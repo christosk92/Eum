@@ -10,6 +10,6 @@ internal sealed class SpotifyTcpConnectionFactory : ISpotifyConnectionFactory
     {
         _apResolver = apResolver;
     }
-    public ISpotifyConnection GetNewConnection()
+    public INewSpotifyConnection GetNewConnection()
         => new SpotifyTcpConnection(_apResolver);
 }

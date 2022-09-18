@@ -1,4 +1,5 @@
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.IntermediateConnection;
 using Eum.Cores.Spotify.Factories;
 using NSubstitute;
 using Xunit;
@@ -10,7 +11,8 @@ public class SpotifyConnectionProviderTests
     private readonly ISpotifyConnectionProvider _sut;
     private readonly ISpotifyConnectionFactory _connectionFactory = Substitute.For<ISpotifyConnectionFactory>();
     private readonly ILoginCredentialsProvider _loginCredentialsProvider = Substitute.For<ILoginCredentialsProvider>();
-    private readonly ISpotifyConnection _spotifyConnection = Substitute.For<ISpotifyConnection>();
+    private readonly INewSpotifyConnection _spotifyConnection = 
+        Substitute.For<INewSpotifyConnection>();
     public SpotifyConnectionProviderTests()
     {
         _sut = new SpotifyTcpConnectionProvider(_loginCredentialsProvider, _connectionFactory);
