@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eum.Cores.Apple", "src\Eum.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eum.Cores.Spotify", "src\Eum.Cores.Spotify\Eum.Cores.Spotify.csproj", "{93342366-B1A6-4876-BF4F-3FCD1DE89029}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppleCoreTests", "src\Tests\AppleCoreTests\AppleCoreTests.csproj", "{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppleCoreTests", "Tests\AppleCoreTests\AppleCoreTests.csproj", "{2CBB1CD8-9452-4AEA-9FD8-AF03D20E38B9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{073975C2-C5BF-4637-BE4C-885904E816B6}"
 EndProject
@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionExample"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eum.Cores.Spotify.Contracts", "src\Eum.Cores.Spotify.Contracts\Eum.Cores.Spotify.Contracts.csproj", "{05DACA52-5C18-4667-8E22-4CC1DAAD979B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyCoreTests", "src\Tests\SpotifyCoreTests\SpotifyCoreTests.csproj", "{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyCoreTests", "Tests\SpotifyCoreTests\SpotifyCoreTests.csproj", "{6747B7B5-02AC-4642-9475-F3ED6EF7AAD1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyConsoleTest", "Examples\SpotifyConsoleTest\SpotifyConsoleTest.csproj", "{F4EA014E-7546-4BFF-82E8-2CCC36A1A88E}"
 EndProject
