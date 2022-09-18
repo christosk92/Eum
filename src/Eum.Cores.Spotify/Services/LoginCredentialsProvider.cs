@@ -1,5 +1,6 @@
 using CPlayerLib;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
 using Google.Protobuf;
 
 namespace Eum.Cores.Spotify.Services;

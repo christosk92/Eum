@@ -1,6 +1,6 @@
 using CPlayerLib;
 
-namespace Eum.Cores.Spotify.Contracts;
+namespace Eum.Cores.Spotify.Contracts.CoreConnection;
 
 public interface ISpotifyConnectionFactory
 {

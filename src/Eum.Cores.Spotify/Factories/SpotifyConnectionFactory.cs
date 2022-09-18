@@ -1,10 +1,11 @@
 using CPlayerLib;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
 
 namespace Eum.Cores.Spotify.Factories;
 
-internal sealed class SpotifyConnectionFactory : ISpotifyConnectionFactory
+public sealed class SpotifyConnectionFactory : ISpotifyConnectionFactory
 {
     private readonly ITcpConnectionFactory _tcpConnectionFactory;
     private readonly IApResolver _apResolver;

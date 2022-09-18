@@ -1,7 +1,7 @@
 using CPlayerLib;
 using Eum.Cores.Spotify.Contracts.Models;
 
-namespace Eum.Cores.Spotify.Contracts;
+namespace Eum.Cores.Spotify.Contracts.CoreConnection;
 
 public interface ITcpConnection : IDisposable
 {

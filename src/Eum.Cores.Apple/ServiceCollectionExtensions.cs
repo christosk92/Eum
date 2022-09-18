@@ -1,5 +1,6 @@
 using Eum.Core;
 using Eum.Core.Contracts;
+using Eum.Cores.Apple.Chrome;
 using Eum.Cores.Apple.Contracts;
 using Eum.Cores.Apple.Contracts.Factory;
 using Eum.Cores.Apple.Models;

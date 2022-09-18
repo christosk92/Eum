@@ -5,17 +5,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.21.6" />
+        <PackageReference Include="Selenium.WebDriver" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Eum.Core\Eum.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Playback" />
+        <ProjectReference Include="..\Eum.Cores.Apple.Contracts\Eum.Cores.Apple.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

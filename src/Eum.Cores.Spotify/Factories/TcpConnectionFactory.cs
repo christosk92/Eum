@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
 
 namespace Eum.Cores.Spotify.Factories;
 

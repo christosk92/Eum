@@ -4,6 +4,8 @@ using Eum.Core.Contracts.Models;
 using Eum.Core.Models;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
+using Eum.Cores.Spotify.Contracts.Services;
 using Eum.Cores.Spotify.Factories;
 using Eum.Cores.Spotify.Services;
 
@@ -13,9 +15,11 @@ public sealed class SpotifyCore : ISpotifyCore
 {
     private readonly ISpotifyConnectionProvider _spotifyConnectionProvider;
 
-    public SpotifyCore(ISpotifyConnectionProvider spotifyConnectionProvider)
+    public SpotifyCore(ISpotifyConnectionProvider spotifyConnectionProvider,
+        ISpotifyBearerService bearerService)
     {
         _spotifyConnectionProvider = spotifyConnectionProvider;
+        BearerClient = bearerService;
     }
 
     public CoreType Type => CoreType.Spotify;
@@ -43,12 +47,14 @@ public sealed class SpotifyCore : ISpotifyCore
         return true;
     }
 
+    public ISpotifyBearerService BearerClient { get; }
+
     public static ISpotifyCore Create(string username, string password)
     {
         var defaultConnectionProvider =
             new SpotifyConnectionProvider(new LoginCredentialsProvider(username, password),
                 new SpotifyConnectionFactory(new ApResolver(new HttpClient()), new TcpConnectionFactory()));
-        return new SpotifyCore(defaultConnectionProvider);
+        return new SpotifyCore(defaultConnectionProvider, new MercuryBearerService(defaultConnectionProvider, new MercuryUrlProvider()));
     }
 }
 

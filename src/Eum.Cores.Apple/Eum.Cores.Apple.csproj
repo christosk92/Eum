@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Eum.Cores.Apple.Chrome\Eum.Cores.Apple.Chrome.csproj" />
       <ProjectReference Include="..\Eum.Cores.Apple.Contracts\Eum.Cores.Apple.Contracts.csproj" />
       <ProjectReference Include="..\Eum.Cores.Apple.MSEdge\Eum.Cores.Apple.MSEdge.csproj" />
       <ProjectReference Include="..\Eum.Core\Eum.Core.csproj" />

@@ -2,6 +2,7 @@ using CPlayerLib;
 using Eum.Core;
 using Eum.Core.Contracts;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
 using Eum.Cores.Spotify.Factories;
 using Eum.Cores.Spotify.Services;
 using Microsoft.Extensions.DependencyInjection;

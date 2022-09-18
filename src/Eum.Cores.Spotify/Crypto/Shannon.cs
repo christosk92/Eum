@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
 
 namespace Eum.Cores.Spotify.Crypto;
 

@@ -2,6 +2,7 @@ using AutoFixture;
 using CPlayerLib;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
 using Eum.Cores.Spotify.Factories;
 using NSubstitute;
 

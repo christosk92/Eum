@@ -1,21 +1,22 @@
-﻿using Eum.Cores.Apple.Contracts;
+﻿using System.Text.Json;
+using Eum.Cores.Apple.Contracts;
 using Eum.Cores.Apple.Contracts.Models;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.DevTools;
 using OpenQA.Selenium.Edge;
-using System.Text.Json;
-using OpenQA.Selenium.Chrome;
 using DevToolsSessionDomains = OpenQA.Selenium.DevTools.V104.DevToolsSessionDomains;
 using Network = OpenQA.Selenium.DevTools.V104.Network;
 
-namespace Eum.Cores.Apple.MSEdge
+
+namespace Eum.Cores.Apple.Chrome
 {
     /// <summary>
-    /// A Selenium, msedge powered authentication webview handler.
-    /// This uses the V104 msedge engine. Please download the msedgedriver binary, and set the directory in the path environment variable.
+    /// A Selenium, chrome powered authentication webview handler.
+    /// This uses the V104 msedge engine. Please download the chromedriver binary, and set the directory in the path environment variable.
     /// </summary>
-    public sealed class EdgeAuthHandler : IMediaTokenOAuthHandler
+    public sealed class ChromeAuthHandler : IMediaTokenOAuthHandler
     {
-        private EdgeDriver? driver = null;
+        private ChromeDriver? driver = null;
         private DevToolsSession? devTools;
         private DevToolsSessionDomains devToolsSession;
 
@@ -24,7 +25,7 @@ namespace Eum.Cores.Apple.MSEdge
             this.callback = callback;
             driver?.Dispose();
             devTools?.Dispose();
-            driver = new EdgeDriver();
+            driver = new ChromeDriver();
             devTools = driver.GetDevToolsSession();
 
             devToolsSession = devTools.GetVersionSpecificDomains<DevToolsSessionDomains>();
@@ -56,7 +57,7 @@ namespace Eum.Cores.Apple.MSEdge
 
         private Func<string, TokenData> callback;
     }
-
+    
     internal sealed class MusicUserTokenData
     {
         public string musicUserToken { get; init; }

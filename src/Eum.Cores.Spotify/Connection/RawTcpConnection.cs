@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using CPlayerLib;
 using Eum.Cores.Spotify.Contracts;
+using Eum.Cores.Spotify.Contracts.CoreConnection;
 using Eum.Cores.Spotify.Contracts.Enums;
 using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Crypto;
@@ -37,8 +39,8 @@ internal sealed class RawTcpConnection : ITcpConnection
 
             using var accumulator = new MemoryStream();
             await client_hello(gc, accumulator, ct);
-            var apResponseMessage = await get_ap_response(accumulator, ct);
 
+            var apResponseMessage = await get_ap_response(accumulator, ct);
 
             var remoteKey = apResponseMessage
                 .Challenge
@@ -88,7 +90,6 @@ internal sealed class RawTcpConnection : ITcpConnection
             _receiveCipher.Key(recv_key);
 
             await client_response(challenge, ct);
-
             _didHandshake = true;
             return true;
         }
@@ -417,19 +418,26 @@ internal sealed class RawTcpConnection : ITcpConnection
         CancellationToken ct = default)
     {
         var networkStream = tcpClient.GetStream();
-        var buffer = new byte[1000];
-        var len = int.Parse((await networkStream.ReadAsync(buffer,
-            0, buffer.Length, ct)).ToString());
+        
+        var buffer = new byte[8096];
+        var len = await networkStream.ReadAsync(buffer,
+            0, buffer.Length, ct);
+      
+        
         var tmp = new byte[len];
         Array.Copy(buffer, tmp, len);
         tmp = tmp.Skip(4).ToArray();
-        
         var lenArr = len.ToByteArray();
-        await accumulator.WriteAsync(lenArr, 0, lenArr.Length, ct);
-        await accumulator.WriteAsync(tmp, 0, tmp.Length, ct);
-        accumulator.Position = 0;
+
         
-        return APResponseMessage.Parser.ParseFrom(tmp);
+        accumulator.Write(lenArr, 0, lenArr.Length);
+         accumulator.Write(tmp, 0, tmp.Length);
+        accumulator.Position = 0;
+     
+        var apresponse = 
+            APResponseMessage.Parser.ParseFrom(tmp);
+
+        return apresponse;
     }
 
     private bool _didHandshake;

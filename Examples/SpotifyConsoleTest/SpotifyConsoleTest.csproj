@@ -8,7 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\Eum.Cores.Apple.MSEdge\Eum.Cores.Apple.MSEdge.csproj" />
+      <ProjectReference Include="..\..\src\Eum.Cores.Apple.Chrome\Eum.Cores.Apple.Chrome.csproj" />
       <ProjectReference Include="..\..\src\Eum.Cores.Spotify\Eum.Cores.Spotify.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Diagnostics;
+using System.Net.Sockets;
 using System.Text;
 
 namespace Eum.Cores.Spotify.Helpers;
@@ -14,7 +15,8 @@ internal static class StreamExtensions
             num += stream.Read(buffer, offset + num, count - num);
     }
 
-    public static async Task ReadCompleteAsync(this Stream stream, byte[] buffer, int offset, int count,
+    public static async Task ReadCompleteAsync(this Stream stream,
+        byte[] buffer, int offset, int count,
         CancellationToken ct = default)
     {
         var num = 0;

@@ -1,10 +1,7 @@
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
 
-namespace Eum.Cores.Spotify.Services;
+namespace Eum.Cores.Spotify.Connect.Services;
 
 public sealed class ApResolver : IApResolver
 {
