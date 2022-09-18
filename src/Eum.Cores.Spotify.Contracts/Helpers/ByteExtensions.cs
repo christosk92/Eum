@@ -6,7 +6,7 @@ namespace Eum.Cores.Spotify.Helpers
     {
         private static readonly char[] HexArray = "0123456789ABCDEF".ToCharArray();
 
-        internal static byte[] ToByteArray(this int i)
+        public static byte[] ToByteArray(this int i)
         {
             var bytes = BitConverter.GetBytes(i);
             if (BitConverter.IsLittleEndian) return bytes.Reverse().ToArray();
@@ -24,7 +24,7 @@ namespace Eum.Cores.Spotify.Helpers
             }
             return dest;
         }
-        internal static byte[] ToByteArray(this BigInteger i)
+        public static byte[] ToByteArray(this BigInteger i)
         {
             var array = i.ToByteArray(true, true);
             if (array[0] == 0) array = array.copyOfRange(1, array.Length);

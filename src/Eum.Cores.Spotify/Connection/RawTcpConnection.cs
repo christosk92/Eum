@@ -34,14 +34,20 @@ internal sealed class RawTcpConnection : ITcpConnection
             return true;
         using (await _handshakeLock.LockAsync(ct))
         {
+            var sw_main = Stopwatch.StartNew();
             var local_keys = new DiffieHellman();
             var gc = local_keys.PublicKeyArray();
 
             using var accumulator = new MemoryStream();
+            var sw_cleint_hello = Stopwatch.StartNew();
             await client_hello(gc, accumulator, ct);
-
+            sw_cleint_hello.Stop();
+            
+            var sw_ap = Stopwatch.StartNew();
             var apResponseMessage = await get_ap_response(accumulator, ct);
+            sw_ap.Stop();
 
+            var sw_verify = Stopwatch.StartNew();
             var remoteKey = apResponseMessage
                 .Challenge
                 .LoginCryptoChallenge
@@ -89,8 +95,13 @@ internal sealed class RawTcpConnection : ITcpConnection
             _receiveCipher = new Shannon();
             _receiveCipher.Key(recv_key);
 
+            sw_verify.Stop();
+
+            var sw_client_response = Stopwatch.StartNew();
             await client_response(challenge, ct);
             _didHandshake = true;
+            sw_client_response.Stop();
+            sw_main.Stop();
             return true;
         }
     }

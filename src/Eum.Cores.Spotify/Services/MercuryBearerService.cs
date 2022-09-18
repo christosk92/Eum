@@ -31,7 +31,6 @@ public sealed class MercuryBearerService : ISpotifyBearerService
 
             var connection = await _spotifyConnectionProvider.GetConnectionAsync(ct);
 
-            
             var url = _mercuryUrlProvider.BearerTokenUrl(new []
             {
                 "playlist-read"
@@ -39,11 +38,7 @@ public sealed class MercuryBearerService : ISpotifyBearerService
 
             var newToken = await connection.SendAndReceiveAsJson<MercuryToken>(
                 url, ct: ct);
-            
-            var newToken_2 = await connection.SendAndReceiveAsJson<MercuryToken>(
-                url, ct: ct);
-      
-            
+
             _previousBearer = newToken;
             return newToken.AccessToken;
         }

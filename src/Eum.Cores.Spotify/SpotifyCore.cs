@@ -5,21 +5,27 @@ using Eum.Core.Models;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
+using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Contracts.Services;
 using Eum.Cores.Spotify.Factories;
 using Eum.Cores.Spotify.Services;
+using Microsoft.Extensions.Options;
 
 namespace Eum.Cores.Spotify;
 
 public sealed class SpotifyCore : ISpotifyCore
 {
     private readonly ISpotifyConnectionProvider _spotifyConnectionProvider;
-
-    public SpotifyCore(ISpotifyConnectionProvider spotifyConnectionProvider,
-        ISpotifyBearerService bearerService)
+    public SpotifyCore(
+        ISpotifyConnectionProvider spotifyConnectionProvider,
+        ISpotifyBearerService bearerService,
+        ISpotifyClientsProvider spotifyClientsProvider,
+        IOptions<SpotifyConfig> config)
     {
+        Config = config.Value;
         _spotifyConnectionProvider = spotifyConnectionProvider;
         BearerClient = bearerService;
+        ClientsProvider = spotifyClientsProvider;
     }
 
     public CoreType Type => CoreType.Spotify;
@@ -48,13 +54,26 @@ public sealed class SpotifyCore : ISpotifyCore
     }
 
     public ISpotifyBearerService BearerClient { get; }
+    public ISpotifyClientsProvider ClientsProvider { get; }
+    public SpotifyConfig Config { get; }
 
     public static ISpotifyCore Create(string username, string password)
     {
-        var defaultConnectionProvider =
-            new SpotifyConnectionProvider(new LoginCredentialsProvider(username, password),
-                new SpotifyConnectionFactory(new ApResolver(new HttpClient()), new TcpConnectionFactory()));
-        return new SpotifyCore(defaultConnectionProvider, new MercuryBearerService(defaultConnectionProvider, new MercuryUrlProvider()));
+        var config = new OptionsWrapper<SpotifyConfig>(new SpotifyConfig());
+        
+        var sharedhttpClient = new HttpClient();
+        var apResolver = new ApResolver(sharedhttpClient);
+        
+        var loginCredentialsProvider = new LoginCredentialsProvider(username, password);
+        var tcpConnectionFactory = new TcpConnectionFactory();
+        var connectionFactory = new SpotifyConnectionFactory(apResolver,  tcpConnectionFactory, config);
+        var connectionProvider = new SpotifyConnectionProvider(loginCredentialsProvider, connectionFactory);
+
+        var bearerService = new MercuryBearerService(connectionProvider, new MercuryUrlProvider());
+        return new SpotifyCore(connectionProvider,
+            bearerService,
+            new RefitClientsProvider(bearerService, apResolver)
+            , config);
     }
 }
 

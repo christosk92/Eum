@@ -29,8 +29,23 @@ public sealed class ApResolver : IApResolver
             _httpClient.GetFromJsonAsync<Dealers>("http://apresolve.spotify.com/?type=dealer", ct);
         return accessPoints.dealer
             .First();
+    }  
+    
+    private string _resolvedSpClient;
+    public async Task<string> GetClosestSpClient(CancellationToken ct)
+    {
+        if (!string.IsNullOrEmpty(_resolvedSpClient))
+            return _resolvedSpClient;
+        //https://apresolve.spotify.com/?type=spclient
+        var spClients = await
+            _httpClient.GetFromJsonAsync<SpClients>("http://apresolve.spotify.com/?type=spclient", ct);
+        _resolvedSpClient = "https://" + spClients.spclient.First();
+        return _resolvedSpClient;
     }
-
+    public readonly struct SpClients
+    {
+        public string[] spclient { get; init; }
+    }
     public readonly struct AccessPoints
     {
         public string[] accesspoint { get; init; }

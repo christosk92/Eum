@@ -1,13 +1,18 @@
 ﻿
 using Eum.Cores.Apple.Chrome;
 using Eum.Cores.Spotify;
+using Eum.Cores.Spotify.Connect;
+using Eum.Cores.Spotify.Contracts.Connect;
 using Eum.Cores.Spotify.Factories;
 
 
-var test = SpotifyCore.Create("tak123chris@gmail.com", 
-    "Hyeminseo22");
+var core = SpotifyCore.Create("a", 
+    "a");
 
-var bearer = await test.BearerClient.GetBearerTokenAsync();
+var connect = SpotifyRemote.Create(core);
 
+var test_data = await connect.EnsureConnectedAsync();
+var m = new ManualResetEvent(false);
+m.WaitOne();
 
 var t = "";

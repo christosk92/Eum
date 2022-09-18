@@ -28,6 +28,11 @@ public sealed class ApResolver : IApResolver
             .First();
     }
 
+    public Task<string> GetClosestSpClient(CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
     public readonly struct AccessPoints
     {
         public string[] accesspoint { get; init; }

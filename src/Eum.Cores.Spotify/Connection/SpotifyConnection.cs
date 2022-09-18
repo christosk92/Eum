@@ -10,6 +10,7 @@ using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Helpers;
 using Eum.Cores.Spotify.Models;
 using Google.Protobuf;
+using Microsoft.Extensions.Options;
 using Nito.AsyncEx;
 
 namespace Eum.Cores.Spotify.Connection;
@@ -31,9 +32,14 @@ public sealed class SpotifyConnection : ISpotifyConnection
 
     private CancellationTokenSource? _waitForPackagesToken;
 
-    public SpotifyConnection(IApResolver apResolver, LoginCredentials loginCredentials,
-        ITcpConnectionFactory tcpConnectionFactory)
+    private readonly SpotifyConfig _config;
+    public SpotifyConnection(IApResolver apResolver, 
+        LoginCredentials loginCredentials,
+        ITcpConnectionFactory tcpConnectionFactory,
+        IOptions<SpotifyConfig> config)
     {
+        _config = config.Value;
+        //Utils.RandomHexString(40).ToLower()
         _apResolver = apResolver;
         _loginCredentials = loginCredentials;
         _tcpConnectionFactory = tcpConnectionFactory;
@@ -41,7 +47,6 @@ public sealed class SpotifyConnection : ISpotifyConnection
     }
 
     public Guid ConnectionId { get; }
-    public string DeviceId { get; private set; }
 
     public bool IsAlive => APWelcome != null && _currentConnection is { IsAlive: true };
     public APWelcome? APWelcome { get; private set; }
@@ -69,10 +74,10 @@ public sealed class SpotifyConnection : ISpotifyConnection
         var (host, port) = await _apResolver.GetClosestAccessPoint(ct);
         _currentConnection = _tcpConnectionFactory.GetTcpConnection(host, port, ct);
 
-        DeviceId = Utils.RandomHexString(40).ToLower();
+        
         var handshake = await _currentConnection.HandshakeAsync(ct);
 
-        APWelcome = await _currentConnection.AuthenticateAsync(_loginCredentials, DeviceId, ct);
+        APWelcome = await _currentConnection.AuthenticateAsync(_loginCredentials, _config.DeviceId, ct);
         _ = Task.Run(async () => await ListenForPacakges());
     }
 

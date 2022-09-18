@@ -3,7 +3,9 @@ using CPlayerLib;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
+using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Factories;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 
 namespace SpotifyCoreTests;
@@ -21,7 +23,7 @@ public class SpotifyConnectionTest
     {
         _loginCredentials = _fixture.Build<LoginCredentials>()
             .Create();
-        _sut = new SpotifyConnection(_apResolver, _loginCredentials, _tcpConnectionFactory);
+        _sut = new SpotifyConnection(_apResolver, _loginCredentials, _tcpConnectionFactory, new OptionsWrapper<SpotifyConfig>(new SpotifyConfig()));
     }
     
 }
