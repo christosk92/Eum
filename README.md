@@ -8,7 +8,8 @@ For [Apple Music](src/Eum.Cores.Apple) & [Spotify](src/Eum.Cores.Spotify).
 
 |                |Apple Music                          |Spotify                         |
 |----------------|-------------------------------|-----------------------------|
-|**Fetch basic data**|  In Progress            |In Progress            |
-|**Playback**          |Planned for future release            |In Progress            |
+|**Sign In**| ✅ Done | ✅ Done
+|**Fetch basic data**|  🚧 In Progress            | 🚧 In Progress            |
+|**Playback**          | 🤔 Planned for future release            | 🚧 In Progress            |
 
 
