@@ -1,16 +1,25 @@
+using CPlayerLib;
+using Eum.Cores.Spotify.Contracts.Models;
+
 namespace Eum.Cores.Spotify.Contracts;
 
 public interface ITcpConnection : IDisposable
 {
-    bool IsConnected { get; }
-    bool DataAvailable { get; }
-    int ReadTimeout { get; set; }
+    
+    /// <summary>
+    /// Initiate a client hello (handshake) with the server.
+    /// </summary>
+    /// <param name="ct"></param>
+    /// <returns>The written data to the server, as a byte array. Use this to verify the signature.</returns>
+    Task<bool> HandshakeAsync(CancellationToken ct = default);
 
-    void WriteByte(byte value);
-    Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken);
-    Task FlushAsync(CancellationToken ct);
-    Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken);
-
-    Task<byte[]> ReadCompleteAsync(
+    Task<APWelcome> AuthenticateAsync(
+        LoginCredentials credentials,
+        string deviceId,
         CancellationToken ct = default);
+
+    Task SendPacketAsync(MercuryPacket packet, CancellationToken ct = default);
+    Task<MercuryPacket> NextAsync(CancellationToken ct = default);
+    
+    bool IsAlive { get; }
 }

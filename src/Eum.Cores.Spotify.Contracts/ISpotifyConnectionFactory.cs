@@ -4,5 +4,5 @@ namespace Eum.Cores.Spotify.Contracts;
 
 public interface ISpotifyConnectionFactory
 {
-    ISpotifyConnection GetNewConnection();
+    ISpotifyConnection GetNewConnection(LoginCredentials loginCredentials);
 }

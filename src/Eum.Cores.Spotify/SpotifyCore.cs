@@ -36,11 +36,18 @@ public sealed class SpotifyCore : ISpotifyCore
         });
     }
 
+    public async Task<bool> EnsureConnectedAsync(CancellationToken ct = default)
+    {
+        var spotifyConnection = await _spotifyConnectionProvider.GetConnectionAsync(ct); 
+        await spotifyConnection.EnsureConnectedAsync(ct);
+        return true;
+    }
+
     public static ISpotifyCore Create(string username, string password)
     {
         var defaultConnectionProvider =
-            new SpotifyTcpConnectionProvider(new LoginCredentialsProvider(username, password),
-                new SpotifyTcpConnectionFactory(new ApResolver(new HttpClient())));
+            new SpotifyConnectionProvider(new LoginCredentialsProvider(username, password),
+                new SpotifyConnectionFactory(new ApResolver(new HttpClient()), new TcpConnectionFactory()));
         return new SpotifyCore(defaultConnectionProvider);
     }
 }

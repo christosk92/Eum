@@ -16,7 +16,9 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IUnifiedIdsConfiguration, GenericUnifiedIdsConfiguration>();
 
         services.AddSingleton<ILoginCredentialsProvider, LoginCredentialsProvider>();
-        services.AddSingleton<ISpotifyConnectionProvider, SpotifyTcpConnectionProvider>();
+        services.AddSingleton<ISpotifyConnectionProvider, SpotifyConnectionProvider>();
+        services.AddTransient<ISpotifyConnectionFactory, SpotifyConnectionFactory>();
+        
         services.AddSingleton<ISpotifyCore, SpotifyCore>();
         services.AddTransient<IMusicCore>(provider => provider.GetService<ISpotifyCore>()!);
         return services;

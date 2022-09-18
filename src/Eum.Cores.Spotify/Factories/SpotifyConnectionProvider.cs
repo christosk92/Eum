@@ -3,11 +3,11 @@ using Eum.Cores.Spotify.Contracts;
 
 namespace Eum.Cores.Spotify.Factories;
 
-public sealed class SpotifyTcpConnectionProvider : ISpotifyConnectionProvider
+public sealed class SpotifyConnectionProvider : ISpotifyConnectionProvider
 {
     private readonly ILoginCredentialsProvider _loginCredentials;
     private readonly ISpotifyConnectionFactory _spotifyConnectionFactory;
-    public SpotifyTcpConnectionProvider(ILoginCredentialsProvider loginCredentialsProvider, 
+    public SpotifyConnectionProvider(ILoginCredentialsProvider loginCredentialsProvider, 
         ISpotifyConnectionFactory spotifyConnectionFactory)
     {
         _loginCredentials = loginCredentialsProvider;
@@ -20,10 +20,9 @@ public sealed class SpotifyTcpConnectionProvider : ISpotifyConnectionProvider
         {
             return _previousConnection.connection;
         }
+        var newConnection = _spotifyConnectionFactory.GetNewConnection(credentials);
+        await newConnection.EnsureConnectedAsync(ct);
         
-        var newConnection = _spotifyConnectionFactory.GetNewConnection()
-        await newConnection.HandshakeAsync(ct);
-        await newConnection.AuthenticateAsync(credentials, ct);
         _previousConnection = new _t
         {
             forCredentials = credentials,
