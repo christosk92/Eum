@@ -1,47 +1,53 @@
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
 
-namespace Eum.Cores.Spotify.Services;
+namespace Eum.Cores.Spotify.Contracts.Helpers;
 
 public sealed class ApResolver : IApResolver
 {
-    private readonly HttpClient _httpClient;
+    private readonly Func<HttpClient> _httpClientFactory;
     public ApResolver(HttpClient httpClient)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = () => httpClient;
+    }
+    public ApResolver(IApResolverHttpClientProvider httpClientProvider)
+    {
+        _httpClientFactory = httpClientProvider.GetHttpClient;
     }
 
     public async Task<(string, ushort)> GetClosestAccessPoint(CancellationToken ct = default)
     {
+        var httpClient = _httpClientFactory();
         var accessPoints = await
-            _httpClient.GetFromJsonAsync<AccessPoints>("http://apresolve.spotify.com/?type=accesspoint", ct);
+            httpClient.GetFromJsonAsync<AccessPoints>("http://apresolve.spotify.com/?type=accesspoint", ct);
         return accessPoints.accesspoint.Select(host =>
                 (host.Split(':')[0], ushort.Parse(host.Split(':')[1])))
             .ToArray()
             .First();
     }
     public async Task<string> GetClosestDealerAsync(CancellationToken ct)
-    {
+    {        
+        var httpClient = _httpClientFactory();
+
         var accessPoints = await
-            _httpClient.GetFromJsonAsync<Dealers>("http://apresolve.spotify.com/?type=dealer", ct);
+            httpClient.GetFromJsonAsync<Dealers>("http://apresolve.spotify.com/?type=dealer", ct);
         return accessPoints.dealer
             .First();
-    }  
-    
+    }
+
     private string _resolvedSpClient;
     public async Task<string> GetClosestSpClient(CancellationToken ct)
     {
         if (!string.IsNullOrEmpty(_resolvedSpClient))
             return _resolvedSpClient;
+        
+        var httpClient = _httpClientFactory();
         //https://apresolve.spotify.com/?type=spclient
         var spClients = await
-            _httpClient.GetFromJsonAsync<SpClients>("http://apresolve.spotify.com/?type=spclient", ct);
+            httpClient.GetFromJsonAsync<SpClients>("http://apresolve.spotify.com/?type=spclient", ct);
         _resolvedSpClient = "https://" + spClients.spclient.First();
         return _resolvedSpClient;
-    }
+    }   
     public readonly struct SpClients
     {
         public string[] spclient { get; init; }

@@ -1,6 +1,7 @@
 using Eum.Cores.Spotify.Contracts.Connect;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
 using Eum.Cores.Spotify.Contracts.Services;
+using Nito.AsyncEx;
 
 namespace Eum.Cores.Spotify.Connect.Factories;
 
@@ -18,27 +19,37 @@ public sealed class SpotifyRemoteConnectionProvider : ISpotifyRemoteConnectionPr
         _apResolver = apResolver;
         _bearerService = bearerService;
     }
-    
-    public async ValueTask<ISpotifyRemoteConnection> GetConnectionAsync(CancellationToken ct = default)
+
+    private AsyncLock _getconnectionLock = new AsyncLock();
+
+    public async ValueTask<ISpotifyRemoteConnection?> GetConnectionAsync(CancellationToken ct = default)
     {
-        if (_previousConnection is
-            {
-                IsAlive: true
-            })
-            return _previousConnection;
+        using (_getconnectionLock.Lock(ct))
+        {
+            if (_previousConnection is
+                {
+                    IsAlive: true
+                })
+                return _previousConnection;
+            
+                _previousConnection?.Dispose();
+                var getWssUrl = await _apResolver.GetClosestDealerAsync(ct);
+                var token = await _bearerService.GetBearerTokenAsync(ct);
+                var socketUrl =
+                    $"wss://{getWssUrl.Replace("https://", string.Empty)}/" +
+                    $"?access_token={token}";
+                var getconnection =
+                    _connectionFactory.GetConnection(socketUrl);
 
-        var getWssUrl = await _apResolver.GetClosestDealerAsync(ct);
-        var token = await _bearerService.GetBearerTokenAsync(ct);
-        var socketUrl =
-            $"wss://{getWssUrl.Replace("https://", string.Empty)}/" +
-            $"?access_token={token}";
-        var getconnection =
-            _connectionFactory.GetConnection(socketUrl);
-        
-        await getconnection.EnsureConnectedAsync(ct);
+                var connected = await getconnection.EnsureConnectedAsync(ct);
+                if (!connected)
+                {
+                    getconnection.Dispose();
+                    return null;
+                }
+                _previousConnection = getconnection;
 
-        _previousConnection = getconnection;
-        
-        return getconnection;
+                return getconnection;
+        }
     }
 }

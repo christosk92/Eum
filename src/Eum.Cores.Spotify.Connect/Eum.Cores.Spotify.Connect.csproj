@@ -17,4 +17,8 @@
       <PackageReference Include="Websocket.Client" Version="4.4.43" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services" />
+    </ItemGroup>
+
 </Project>

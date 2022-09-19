@@ -5,6 +5,7 @@ using Eum.Core.Models;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
+using Eum.Cores.Spotify.Contracts.Helpers;
 using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Contracts.Services;
 using Eum.Cores.Spotify.Factories;
@@ -61,8 +62,7 @@ public sealed class SpotifyCore : ISpotifyCore
     {
         var config = new OptionsWrapper<SpotifyConfig>(new SpotifyConfig());
         
-        var sharedhttpClient = new HttpClient();
-        var apResolver = new ApResolver(sharedhttpClient);
+        var apResolver = new ApResolver(new ApResolverHttpClientProvider());
         
         var loginCredentialsProvider = new LoginCredentialsProvider(username, password);
         var tcpConnectionFactory = new TcpConnectionFactory();

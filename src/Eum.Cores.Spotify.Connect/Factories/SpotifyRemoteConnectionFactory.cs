@@ -1,3 +1,4 @@
+using System.Net.WebSockets;
 using Eum.Cores.Spotify.Contracts.Connect;
 using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Contracts.Services;
@@ -18,9 +19,16 @@ public sealed class SpotifyRemoteConnectionFactory : ISpotifyRemoteConnectionFac
         _spClient = spClient;
         _remoteConnectionConfig = remoteConnectionConfig;
     }
-    public ISpotifyRemoteConnection GetConnection(string websocketUrl)
+    public ISpotifyRemoteConnection? GetConnection(string websocketUrl)
     {
-        var newwsClient = new WebsocketClient(new Uri(websocketUrl));
+        var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+        {
+            Options =
+            {
+                KeepAliveInterval = TimeSpan.FromDays(1),
+            },
+        });
+        var newwsClient = new WebsocketClient(new Uri(websocketUrl), factory);
         newwsClient.ReconnectTimeout = null;
         newwsClient.IsReconnectionEnabled = false;
         return new SpotifyRemoteConnection(newwsClient, _spotifyBearerService, _spClient, 
