@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Eum.Cores.Spotify.Contracts\Eum.Cores.Spotify.Contracts.csproj" />
+      <ProjectReference Include="..\Eum.Cores.Spotify.Shared\Eum.Cores.Spotify.Shared.csproj" />
       <ProjectReference Include="..\Eum.Core\Eum.Core.csproj" />
     </ItemGroup>
 

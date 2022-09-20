@@ -8,7 +8,7 @@ using NSubstitute;
 
 namespace AppleCoreTests;
 
-public class AppleCoreDITests
+public sealed class AppleCoreDITests
 {
     private readonly IFixture _fixture = new Fixture();
     private readonly IDeveloperTokenService _developerTokenService = Substitute.For<IDeveloperTokenService>();

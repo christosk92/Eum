@@ -7,8 +7,10 @@ using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
 using Eum.Cores.Spotify.Contracts.Enums;
 using Eum.Cores.Spotify.Contracts.Models;
+using Eum.Cores.Spotify.Contracts.Services;
 using Eum.Cores.Spotify.Helpers;
 using Eum.Cores.Spotify.Models;
+using Eum.Cores.Spotify.Shared.Helpers;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using Nito.AsyncEx;
@@ -324,7 +326,7 @@ public sealed class SpotifyConnection : ISpotifyConnection
     };
 }
 
-public class MercuryException : Exception
+public sealed class MercuryException : Exception
 {
     public MercuryException(MercuryResponse response)
     {

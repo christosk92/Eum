@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace AppleCoreTests;
 
-public class AppleCoreConstructorTests
+public sealed class AppleCoreConstructorTests
 {
     private readonly IFixture _fixture = new Fixture();
     

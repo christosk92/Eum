@@ -1,18 +1,14 @@
 using System.Net.Http.Json;
-using Eum.Cores.Spotify.Contracts.CoreConnection;
+using Eum.Cores.Spotify.Contracts.Services;
 
-namespace Eum.Cores.Spotify.Contracts.Helpers;
+namespace Eum.Cores.Spotify.Shared.Services;
 
 public sealed class ApResolver : IApResolver
 {
     private readonly Func<HttpClient> _httpClientFactory;
-    public ApResolver(HttpClient httpClient)
+    public ApResolver(HttpClient httpClientProvider)
     {
-        _httpClientFactory = () => httpClient;
-    }
-    public ApResolver(IApResolverHttpClientProvider httpClientProvider)
-    {
-        _httpClientFactory = httpClientProvider.GetHttpClient;
+        _httpClientFactory = () => httpClientProvider;
     }
 
     public async Task<(string, ushort)> GetClosestAccessPoint(CancellationToken ct = default)

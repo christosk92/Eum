@@ -1,14 +1,21 @@
 ﻿
+using Eum.Core;
+using Eum.Core.Contracts;
+using Eum.Cores.Apple;
 using Eum.Cores.Apple.Chrome;
+using Eum.Cores.Apple.Contracts;
+using Eum.Cores.Apple.Models;
 using Eum.Cores.Spotify;
 using Eum.Cores.Spotify.Connect;
+using Eum.Cores.Spotify.Connect.Helpers;
 using Eum.Cores.Spotify.Contracts.Connect;
 using Eum.Cores.Spotify.Factories;
 
 
-var core = SpotifyCore.Create("", ")";
+var spotifyCore = SpotifyCore.Create();
 
-var connect = SpotifyRemote.Create(core);
+var connect = SpotifyRemote.Create(spotifyCore);
+
 
 connect.Disconnected += (sender, s) =>
 {
@@ -22,12 +29,19 @@ connect.Disconnected += (sender, s) =>
     });
 };
 
-connect.ClusterUpdated += (sender, update) =>
+var middleWare = new ClusterMiddleware(connect);
+middleWare.CurrentyPlayingChanged += (sender, s) =>
 {
 
 };
-
+middleWare.Seeked += (sender, l) =>
+{
+    var timeSpan = TimeSpan.FromMilliseconds((double)l);
+    Console.WriteLine($"{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}");
+};
+middleWare.Connect();
 var test_data = await connect.EnsureConnectedAsync();
+
 var m = new ManualResetEvent(false);
 m.WaitOne();
 

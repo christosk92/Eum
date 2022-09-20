@@ -1,5 +1,4 @@
 using Connectstate;
-using Eum.Cores.Spotify.Contracts.Helpers;
 
 namespace Eum.Cores.Spotify.Contracts.Connect;
 

@@ -10,7 +10,7 @@ using Eum.Cores.Spotify;
 
 namespace DependencyInjectionExample;
 
-public class Worker : BackgroundService
+public sealed class Worker : BackgroundService
 {
     private readonly IMergedCore _mergedCore;
     private readonly ILogger<Worker> _logger;

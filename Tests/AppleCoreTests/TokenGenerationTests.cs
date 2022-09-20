@@ -8,7 +8,7 @@ using NSubstitute;
 
 namespace AppleCoreTests;
 
-public class TokenGenerationTests
+public sealed class TokenGenerationTests
 {
     private IDeveloperTokenService _sut;
     private readonly ISecretTokenFileProvider _fileProvider = Substitute.For<ISecretTokenFileProvider>();

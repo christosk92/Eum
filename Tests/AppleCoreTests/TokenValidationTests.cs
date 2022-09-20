@@ -13,7 +13,7 @@ using RichardSzalay.MockHttp;
 
 namespace AppleCoreTests;
 
-public class TokenValidationTests
+public sealed class TokenValidationTests
 {
     private readonly MockHttpMessageHandler _httpClientHandler;
     private readonly ITokenValidation _sut;

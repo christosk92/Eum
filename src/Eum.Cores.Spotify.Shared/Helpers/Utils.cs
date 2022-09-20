@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Google.Protobuf;
 
-namespace Eum.Cores.Spotify.Helpers;
+namespace Eum.Cores.Spotify.Shared.Helpers;
 
 public static class Utils
 {

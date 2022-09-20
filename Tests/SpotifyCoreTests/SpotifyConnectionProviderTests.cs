@@ -7,7 +7,7 @@ using NSubstitute;
 
 namespace SpotifyCoreTests;
 
-public class SpotifyConnectionProviderTests
+public sealed class SpotifyConnectionProviderTests
 {
     private readonly ISpotifyConnectionProvider _sut;
     private readonly ISpotifyConnectionFactory _connectionFactory = Substitute.For<ISpotifyConnectionFactory>();

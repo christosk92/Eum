@@ -2,7 +2,7 @@
 
 namespace Eum.Cores.Spotify.Exceptions;
 
-public class UnknownDataException : Exception
+public sealed class UnknownDataException : Exception
 {
     internal UnknownDataException(string cmd, byte[] data)
     {

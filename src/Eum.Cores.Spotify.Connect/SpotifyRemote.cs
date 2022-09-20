@@ -3,8 +3,10 @@ using Eum.Cores.Spotify.Connect.Factories;
 using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.Connect;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
-using Eum.Cores.Spotify.Contracts.Helpers;
 using Eum.Cores.Spotify.Contracts.Models;
+using Eum.Cores.Spotify.Shared;
+using Eum.Cores.Spotify.Shared.Helpers;
+using Eum.Cores.Spotify.Shared.Services;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
 using Nito.AsyncEx;
@@ -12,18 +14,16 @@ using Websocket.Client;
 
 namespace Eum.Cores.Spotify.Connect;
 
-public class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOption
+public sealed class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOption
 {
-    private readonly IApResolverHttpClientProvider _apResolverHttpClientProvider;
     private readonly ISpotifyRemoteConnectionProvider _connectionProvider;
     private readonly ISpotifyCore _core;
     private ISpotifyRemoteConnection? _currentConnection;
 
-    public SpotifyRemote(ISpotifyCore core, ISpotifyRemoteConnectionProvider connectionProvider, IApResolverHttpClientProvider apResolverHttpClientProvider)
+    public SpotifyRemote(ISpotifyCore core, ISpotifyRemoteConnectionProvider connectionProvider)
     {
         _core = core;
         _connectionProvider = connectionProvider;
-        _apResolverHttpClientProvider = apResolverHttpClientProvider;
     }
     
     //facade pattern
@@ -31,16 +31,12 @@ public class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOption
         string deviceName = "Eum-Desktop")
     {
         var spclient = AsyncContext.Run(async () => await core.ClientsProvider.SpClient());
-
-        var httpClientProvider = new ApResolverHttpClientProvider();
-        
-        var apResolver = new ApResolver(httpClientProvider);
+        var apResolver = new ApResolver(new HttpClient());
         return new SpotifyRemote(core,
             new SpotifyRemoteConnectionProvider(new SpotifyRemoteConnectionFactory(core.BearerClient, 
                     spclient, 
                     new OptionsWrapper<SpotifyConfig>(core.Config)),
-                apResolver, core.BearerClient),
-            httpClientProvider);
+                apResolver, core.BearerClient));
     }
     public Cluster? LatestReceivedCluster { get; }
     
@@ -88,7 +84,6 @@ public class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOption
     {
         try
         {
-            _apResolverHttpClientProvider.RefreshHttpClient(); 
             var connected =
                 await EnsureConnectedAsync(ct);
             return connected;

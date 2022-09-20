@@ -11,6 +11,7 @@ using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Crypto;
 using Eum.Cores.Spotify.Exceptions;
 using Eum.Cores.Spotify.Helpers;
+using Eum.Cores.Spotify.Shared.Helpers;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using Nito.AsyncEx;

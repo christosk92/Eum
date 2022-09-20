@@ -154,11 +154,11 @@ internal record MergedCore : IMergedCore
     }
 }
 
-public class CouldNotFindMergedIdException : Exception
+public sealed class CouldNotFindMergedIdException : Exception
 {
 }
 
-internal class CoreExceptionWrapper : ICoreResponse
+internal sealed class CoreExceptionWrapper : ICoreResponse
 {
     public CoreExceptionWrapper(Exception exception)
     {

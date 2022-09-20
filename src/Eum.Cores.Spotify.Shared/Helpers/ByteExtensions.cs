@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Eum.Cores.Spotify.Helpers
+namespace Eum.Cores.Spotify.Shared.Helpers
 {
     public static class ByteExtensions
     {

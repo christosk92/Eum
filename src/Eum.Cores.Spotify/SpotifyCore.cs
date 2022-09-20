@@ -5,11 +5,12 @@ using Eum.Core.Models;
 using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
-using Eum.Cores.Spotify.Contracts.Helpers;
 using Eum.Cores.Spotify.Contracts.Models;
 using Eum.Cores.Spotify.Contracts.Services;
 using Eum.Cores.Spotify.Factories;
 using Eum.Cores.Spotify.Services;
+using Eum.Cores.Spotify.Shared.Helpers;
+using Eum.Cores.Spotify.Shared.Services;
 using Microsoft.Extensions.Options;
 
 namespace Eum.Cores.Spotify;
@@ -24,6 +25,7 @@ public sealed class SpotifyCore : ISpotifyCore
         IOptions<SpotifyConfig> config)
     {
         Config = config.Value;
+        Config.DeviceId = Utils.RandomHexString(40).ToLower();
         _spotifyConnectionProvider = spotifyConnectionProvider;
         BearerClient = bearerService;
         ClientsProvider = spotifyClientsProvider;
@@ -62,7 +64,7 @@ public sealed class SpotifyCore : ISpotifyCore
     {
         var config = new OptionsWrapper<SpotifyConfig>(new SpotifyConfig());
         
-        var apResolver = new ApResolver(new ApResolverHttpClientProvider());
+        var apResolver = new ApResolver(new HttpClient());
         
         var loginCredentialsProvider = new LoginCredentialsProvider(username, password);
         var tcpConnectionFactory = new TcpConnectionFactory();
@@ -78,7 +80,7 @@ public sealed class SpotifyCore : ISpotifyCore
 }
 
 
-public class SpotifyArtist : IArtist
+public sealed class SpotifyArtist : IArtist
 {
     public bool IsError => false;
     public string Id { get; }

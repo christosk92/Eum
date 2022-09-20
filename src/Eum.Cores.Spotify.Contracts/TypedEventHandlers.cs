@@ -1,4 +1,4 @@
-namespace Eum.Cores.Spotify.Contracts.Helpers;
+namespace Eum.Cores.Spotify.Contracts;
 
 /// <summary>
 /// Delegate used to handle events with a strongly-typed sender.

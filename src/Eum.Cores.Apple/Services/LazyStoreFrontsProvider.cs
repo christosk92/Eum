@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Eum.Cores.Apple.Services;
 
-public class LazyStoreFrontsProvider : IStoreFrontProvider
+public sealed class LazyStoreFrontsProvider : IStoreFrontProvider
 {
     private StoreFrontObject _storeFrontObject;
 

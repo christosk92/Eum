@@ -1,5 +1,5 @@
 ﻿namespace Eum.Cores.Spotify.Playback;
 
-public class Class1
+public sealed class Class1
 {
 }

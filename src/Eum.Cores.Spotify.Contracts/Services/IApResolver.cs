@@ -1,4 +1,4 @@
-namespace Eum.Cores.Spotify.Contracts.CoreConnection;
+namespace Eum.Cores.Spotify.Contracts.Services;
 
 public interface IApResolver
 {

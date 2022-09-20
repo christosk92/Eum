@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Eum.Core.Models;
 
-public class PaginatedWrapper<T>
+public sealed class PaginatedWrapper<T>
 {
     /// <summary>
     /// A paginated collection of resources for the request.

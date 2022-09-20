@@ -3,6 +3,7 @@ using Eum.Cores.Spotify.Connection;
 using Eum.Cores.Spotify.Contracts;
 using Eum.Cores.Spotify.Contracts.CoreConnection;
 using Eum.Cores.Spotify.Contracts.Models;
+using Eum.Cores.Spotify.Contracts.Services;
 using Microsoft.Extensions.Options;
 
 namespace Eum.Cores.Spotify.Factories;
