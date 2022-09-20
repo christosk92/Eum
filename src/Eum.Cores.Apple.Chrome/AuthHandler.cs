@@ -1,7 +1,6 @@
-using Eum.Cores.Apple.Chrome;
 using Eum.Cores.Apple.Contracts;
 
-namespace Eum.Cores.Chrome;
+namespace Eum.Cores.Apple.Chrome;
 
 public static partial class AuthHandler
 {

@@ -25,7 +25,7 @@ public sealed class SpotifyCore : ISpotifyCore
         IOptions<SpotifyConfig> config)
     {
         Config = config.Value;
-        Config.DeviceId = Utils.RandomHexString(40).ToLower();
+        Config.DeviceId ??= Utils.RandomHexString(40).ToLower();
         _spotifyConnectionProvider = spotifyConnectionProvider;
         BearerClient = bearerService;
         ClientsProvider = spotifyClientsProvider;

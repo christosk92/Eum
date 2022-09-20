@@ -12,7 +12,7 @@ using Eum.Cores.Spotify.Contracts.Connect;
 using Eum.Cores.Spotify.Factories;
 
 
-var spotifyCore = SpotifyCore.Create();
+var spotifyCore = SpotifyCore.Create("tak123chris@gmail.com","Hyeminseo22");
 
 var connect = SpotifyRemote.Create(spotifyCore);
 

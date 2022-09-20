@@ -1,7 +1,6 @@
 using Eum.Cores.Apple.Contracts;
-using Eum.Cores.Apple.MSEdge;
 
-namespace Eum.Cores.Edge;
+namespace Eum.Cores.Apple.MSEdge;
 
 public static class AuthHandler
 {
