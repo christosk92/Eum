@@ -1,13 +1,14 @@
 ﻿using Connectstate;
 using Eum.Cores.Spotify.Connect.Helpers.Contracts;
 using Eum.Cores.Spotify.Contracts.Connect;
+using Eum.Cores.Spotify.Contracts.Models;
 
 namespace Eum.Cores.Spotify.Connect.Helpers;
 
 public sealed class ClusterMiddleware : IClusterMiddleware
 {
     private Cluster? _latestCluster;
-    private string? _currentlyPlaying;
+    private CurrentlyPlayingState? _currentlyPlaying;
     private bool _isPaused;
     private bool _isShuffle;
     private long _ts;
@@ -20,7 +21,7 @@ public sealed class ClusterMiddleware : IClusterMiddleware
         _latestCluster = _remote.LatestReceivedCluster;
     }
     
-    public event EventHandler<string>? CurrentyPlayingChanged;
+    public event EventHandler<CurrentlyPlayingState>? CurrentyPlayingChanged;
     public event EventHandler<bool>? PauseChanged;
     public event EventHandler<bool>? ShuffleChanged;
     public event EventHandler<RepeatStateType>? RepeatStateChanged;
@@ -41,7 +42,7 @@ public sealed class ClusterMiddleware : IClusterMiddleware
         if (e?.Cluster == null) return;
         _latestCluster = e.Cluster;
         
-        CurrentlyPlaying = _latestCluster.PlayerState?.Track?.Uri;
+        CurrentlyPlaying = new CurrentlyPlayingState(_latestCluster.PlayerState);
         IsPaused = _latestCluster.PlayerState?.IsPaused ?? true;
         IsShuffle = _latestCluster.PlayerState?.Options?.ShufflingContext ?? false;
         RepeatState = (_latestCluster.PlayerState?.Options?.RepeatingContext ?? false)
@@ -53,14 +54,15 @@ public sealed class ClusterMiddleware : IClusterMiddleware
         Position = GetPosition(_latestCluster);
     }
 
-    public string? CurrentlyPlaying
+    public CurrentlyPlayingState? CurrentlyPlaying
     {
         get => _currentlyPlaying;
         set
         {
-            if (EqualityComparer<string>.Default.Equals(_currentlyPlaying, value)) return;
+            if (_currentlyPlaying?.Equals(value) ?? true) return;
             _currentlyPlaying = value;
-            if (!string.IsNullOrEmpty(value)) CurrentyPlayingChanged?.Invoke(this, value);
+            if (value != null)
+                CurrentyPlayingChanged?.Invoke(this, value);
         }
     }
     public bool IsPaused
@@ -107,6 +109,8 @@ public sealed class ClusterMiddleware : IClusterMiddleware
     }  
     internal static int GetPosition(Cluster cluster)
     {
+        if (cluster.PlayerState.IsPaused)
+            return (int)cluster.PlayerState.PositionAsOfTimestamp;
         var diff = (int)(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - cluster.PlayerState.Timestamp);
         return (int)(cluster.PlayerState.PositionAsOfTimestamp + diff);
     }

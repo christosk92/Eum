@@ -17,6 +17,12 @@ internal sealed class LoginCredentialsProvider : ILoginCredentialsProvider
             AuthData = ByteString.CopyFromUtf8(password)
         };
     }
+
+    public LoginCredentialsProvider()
+    {
+        //empty constructor for DI.
+    }
+    
     public LoginCredentialsProvider(string reusableUsername, string reusableAuthCredentialsBase64,
         AuthenticationType reusableAuthenticationType)
     {

@@ -31,7 +31,7 @@ public sealed class SpotifyRemoteConnection : ISpotifyRemoteConnection
     private readonly CancellationTokenSource _pingToken = new CancellationTokenSource();
     private readonly WebsocketClient _wsClient;
     private readonly ISpotifyBearerService _spotifyBearerService;
-    private readonly ISpClient _spClient;
+    private readonly ISpotifyClientsProvider _clientsProvider;
     private readonly SpotifyRequestStateHolder _requestStateHolder;
 
     private string? _connId;
@@ -39,13 +39,13 @@ public sealed class SpotifyRemoteConnection : ISpotifyRemoteConnection
 
     public SpotifyRemoteConnection(WebsocketClient websocketClient,
         ISpotifyBearerService spotifyBearerService,
-        ISpClient spClient, IOptions<SpotifyConfig> config)
+        ISpotifyClientsProvider spClient, IOptions<SpotifyConfig> config)
     {
         _requestStateHolder =
             new SpotifyRequestStateHolder(config);
         _wsClient = websocketClient;
         _spotifyBearerService = spotifyBearerService;
-        _spClient = spClient;
+        _clientsProvider = spClient;
         _config = config.Value;
         _waitForConnectionId = new AsyncManualResetEvent(false);
         var messageReceived = _wsClient.MessageReceived
@@ -109,10 +109,16 @@ public sealed class SpotifyRemoteConnection : ISpotifyRemoteConnection
         return true;
     }
 
+    public Cluster? PreviousCluster
+    {
+        get;
+        private set;
+    }
+
     public event EventHandler<ClusterUpdate?>? ClusterUpdated;
     public event EventHandler<string>? Disconnected;
 
-    private void OnMessageReceived(ResponseMessage obj)
+    private async Task OnMessageReceived(ResponseMessage obj)
     {
         using var jsonDocument = JsonDocument.Parse(obj.Text);
         if (!jsonDocument.RootElement.TryGetProperty("headers", out var headers_json))
@@ -150,12 +156,13 @@ public sealed class SpotifyRemoteConnection : ISpotifyRemoteConnection
                     gzip.Write(asBytes, 0, asBytes.Length);
                 }
 
+                var spClient = await _clientsProvider.SpClient();
                 ms.Position = 0;
-                var initial = _spClient.PutConnectState(connId,
+                var initial = spClient.PutConnectState(connId,
                     _config.DeviceId,
                     ms).ConfigureAwait(false)
                     .GetAwaiter().GetResult();
-                var test = Cluster.Parser.ParseFrom(initial);
+                PreviousCluster = Cluster.Parser.ParseFrom(initial);
                 // LatestCluster = Cluster.Parser.ParseFrom(initial);
                 ConnectionId = connId;
             }
@@ -252,6 +259,7 @@ public sealed class SpotifyRemoteConnection : ISpotifyRemoteConnection
                         {  
                             var update = ClusterUpdate.Parser.ParseFrom(decodedPayload);
                             ClusterUpdated?.Invoke(this, update);
+                            PreviousCluster = update.Cluster;
                         }
                     }
                     break;

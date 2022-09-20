@@ -11,12 +11,12 @@ public sealed class SpotifyRemoteConnectionFactory : ISpotifyRemoteConnectionFac
 {
     private readonly IOptions<SpotifyConfig> _remoteConnectionConfig;
     private readonly ISpotifyBearerService _spotifyBearerService;
-    private readonly ISpClient _spClient;
-    public SpotifyRemoteConnectionFactory(ISpotifyBearerService spotifyBearerService, ISpClient spClient, 
+    private readonly ISpotifyClientsProvider _spClientsProvider;
+    public SpotifyRemoteConnectionFactory(ISpotifyBearerService spotifyBearerService, ISpotifyClientsProvider spClientProvider, 
         IOptions<SpotifyConfig> remoteConnectionConfig)
     {
         _spotifyBearerService = spotifyBearerService;
-        _spClient = spClient;
+        _spClientsProvider = spClientProvider;
         _remoteConnectionConfig = remoteConnectionConfig;
     }
     public ISpotifyRemoteConnection? GetConnection(string websocketUrl)
@@ -31,7 +31,7 @@ public sealed class SpotifyRemoteConnectionFactory : ISpotifyRemoteConnectionFac
         var newwsClient = new WebsocketClient(new Uri(websocketUrl), factory);
         newwsClient.ReconnectTimeout = null;
         newwsClient.IsReconnectionEnabled = false;
-        return new SpotifyRemoteConnection(newwsClient, _spotifyBearerService, _spClient, 
+        return new SpotifyRemoteConnection(newwsClient, _spotifyBearerService, _spClientsProvider, 
             _remoteConnectionConfig);
     }
 }

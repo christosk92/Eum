@@ -8,6 +8,8 @@ public interface ISpotifyRemoteConnection : IDisposable
     string? ConnectionId { get; }
     Task<bool> EnsureConnectedAsync(CancellationToken ct);
     
+    Cluster? PreviousCluster { get; }
+    
     event EventHandler<ClusterUpdate?>? ClusterUpdated;
     event EventHandler<string>? Disconnected; 
 }

@@ -1,4 +1,4 @@
-namespace Eum.Cores.Spotify.Connect.Helpers;
+namespace Eum.Cores.Spotify.Contracts.Models;
 
 public enum RepeatStateType
 {

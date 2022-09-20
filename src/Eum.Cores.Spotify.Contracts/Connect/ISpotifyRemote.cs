@@ -1,4 +1,5 @@
 using Connectstate;
+using Eum.Cores.Spotify.Contracts.Models;
 
 namespace Eum.Cores.Spotify.Contracts.Connect;
 
@@ -9,5 +10,6 @@ public interface ISpotifyRemote
     event EventHandler<ClusterUpdate?> ClusterUpdated;
     event TypedEventHandler<ISpotifyRemoteReconnectOption, EventArgs>? Disconnected;
 
-    Task<bool> EnsureConnectedAsync(CancellationToken ct = default);
+    ValueTask<bool> EnsureConnectedAsync(CancellationToken ct = default);
+    ValueTask<CurrentlyPlayingState?> GetCurrentlyPlayingAsync(CancellationToken stoppingToken = default);
 }

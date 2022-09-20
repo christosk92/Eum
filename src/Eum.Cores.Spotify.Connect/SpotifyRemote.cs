@@ -20,7 +20,8 @@ public sealed class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOptio
     private readonly ISpotifyCore _core;
     private ISpotifyRemoteConnection? _currentConnection;
 
-    public SpotifyRemote(ISpotifyCore core, ISpotifyRemoteConnectionProvider connectionProvider)
+    public SpotifyRemote(ISpotifyCore core,
+        ISpotifyRemoteConnectionProvider connectionProvider)
     {
         _core = core;
         _connectionProvider = connectionProvider;
@@ -30,11 +31,11 @@ public sealed class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOptio
     public static ISpotifyRemote Create(ISpotifyCore core,
         string deviceName = "Eum-Desktop")
     {
-        var spclient = AsyncContext.Run(async () => await core.ClientsProvider.SpClient());
+        
         var apResolver = new ApResolver(new HttpClient());
         return new SpotifyRemote(core,
             new SpotifyRemoteConnectionProvider(new SpotifyRemoteConnectionFactory(core.BearerClient, 
-                    spclient, 
+                    core.ClientsProvider, 
                     new OptionsWrapper<SpotifyConfig>(core.Config)),
                 apResolver, core.BearerClient));
     }
@@ -43,13 +44,24 @@ public sealed class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOptio
     public event EventHandler<ClusterUpdate?>? ClusterUpdated;
     public event TypedEventHandler<ISpotifyRemoteReconnectOption, EventArgs>? Disconnected; 
     
-    public async Task<bool> EnsureConnectedAsync(CancellationToken ct = default)
+    public async ValueTask<bool> EnsureConnectedAsync(CancellationToken ct = default)
     {
         var connection =
             await _connectionProvider.GetConnectionAsync(ct);
         if (connection == null) return false;
         CurrentConnection = connection;
         return await connection.EnsureConnectedAsync(ct);
+    }
+
+    public async ValueTask<CurrentlyPlayingState?> GetCurrentlyPlayingAsync(CancellationToken stoppingToken = default)
+    {
+        var connected = 
+            await EnsureConnectedAsync(stoppingToken);
+        if (!connected) return null;
+
+        var cluster = CurrentConnection.PreviousCluster
+            .PlayerState;
+        return new CurrentlyPlayingState(cluster);
     }
 
     public ISpotifyRemoteConnection? CurrentConnection
@@ -71,6 +83,8 @@ public sealed class SpotifyRemote : ISpotifyRemote, ISpotifyRemoteReconnectOptio
                     value.Disconnected += CurrentConnectionOnDisconnected;
                 }
             }
+
+            _currentConnection = value;
         }
     }
 

@@ -13,6 +13,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Eum.Cores.Apple\Eum.Cores.Apple.csproj" />
+      <ProjectReference Include="..\..\src\Eum.Cores.Spotify.Connect.Helpers\Eum.Cores.Spotify.Connect.Helpers.csproj" />
+      <ProjectReference Include="..\..\src\Eum.Cores.Spotify.Connect\Eum.Cores.Spotify.Connect.csproj" />
       <ProjectReference Include="..\..\src\Eum.Cores.Spotify\Eum.Cores.Spotify.csproj" />
     </ItemGroup>
 
