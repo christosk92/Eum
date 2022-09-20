@@ -18,7 +18,7 @@ For [Apple Music](src/Eum.Cores.Apple) & [Spotify](src/Eum.Cores.Spotify).
 ## ⚙️ Usage
 
 ```js
-//Create a spotify core client
+//Create a spotify core client 
 var spotifyCore = SpotifyCore.Create("user@domain.com","secret_pwd");  
   
 //Set-up an apple core client, 
@@ -40,4 +40,32 @@ var coreSearchResponse = await mergedCore.SearchAsync("jokjae")
 ```
 
 ## ✏️ Examples
+
+### Requiring
+
+**Id merging**
+
+Eum supports in-memory caching of ``CoreId``. Which is a type that holds an ``id:str`` and ``type:coretype``.
+What this allows is a certain type of id-merging, where you can look-up an artist on for example ``SpotifyCore``, using the ID obtained from ``AppleCore``, and vice-versa.
+
+
+Once you have your ``IMergedCore`` object, you can start caching these objects
+```js
+var appleId = new CoreId  
+{  
+  Id = "1239707923",  
+  Type = CoreType.Apple  
+};  
+var spotifyId = new CoreId  
+{  
+  Id = "7bWYN0sHvyH7yv1uefX07U",  
+  Type = CoreType.Spotify  
+};  
+  
+mergedCore.MergeIds_AndForget(appleId, spotifyId);  
+  
+var artist =   
+ await mergedCore.GetArtist(appleId);
+```
+
 <br>
