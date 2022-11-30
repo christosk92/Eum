@@ -11,10 +11,11 @@ For [Apple Music](src/Eum.Cores.Apple) & [Spotify](src/Eum.Cores.Spotify).
 |                |Apple Music                          |Spotify                         |
 |----------------|-------------------------------|-----------------------------|
 |**Sign In**| ✅ Done | ✅ Done
-|**Fetch basic data**|  🚧 In Progress            | 🚧 In Progress            |
-|**Playback**          | 🤔 Planned for future release            | 🚧 In Progress            |
+|**Fetch basic data**|  🚧 In Progress            | ✅ Done            |
+|**Playback**          | 🤔 Planned for future release            | ✅ Done*           |
 
 
+* Playback is working but not every function is implemented yet. Soon!
 ## ⚙️ Usage
 
 ```js
