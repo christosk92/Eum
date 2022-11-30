@@ -40,6 +40,23 @@ var coreSearchResponse = await mergedCore.SearchAsync("jokjae")
 //TODO
 ```
 
+# Spotify Playback
+
+## Setup
+Creating a new instance of the SpotifyPlaybackClient, will notify the Connect-State that a new device has appeared.
+Like this:
+
+IAudioPlayer player = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? new EumVlcPlayer() : new NAudioPlayer());
+ISpotifyPlaybackClient playbackClient = new SpotifyPlaybackClient(spotifyClient, player);
+
+For macOS, I recommend VLC. Make sure to add a reference to LibVlc and LibVlc.Mac in your runtime project. 
+For Windows, I recommended NAudio (not supported on osx because of waveout event).
+
+It is currently not possible to initiate a playback yourself (working on it), but the app does support transfer commands.
+Meaning the lib will handle a incoming play command (from another device), and transfer the state accordingly. 
+
+If you wish to implement the audio player yourself. Check the readme in the Spotify.Playback project (working on it).
+
 ## ✏️ Examples
 
 ### Requiring
