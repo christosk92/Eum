@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net7.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NAudio" Version="2.1.0" />
+        <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Eum\Eum.csproj" />
+      <ProjectReference Include="..\Eum.Connections.Spotify.Playback\Eum.Connections.Spotify.Playback.csproj" />
+    </ItemGroup>
+    
+</Project>

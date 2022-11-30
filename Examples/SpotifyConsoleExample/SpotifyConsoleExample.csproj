@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Eum\Eum.csproj" />
+      <ProjectReference Include="..\..\src\Spotify\Eum.Connections.Spotify.NAudio\Eum.Connections.Spotify.NAudio.csproj" />
+      <ProjectReference Include="..\..\src\Spotify\Eum.Connections.Spotify.Playback\Eum.Connections.Spotify.Playback.csproj" />
+      <ProjectReference Include="..\..\src\Spotify\Eum.Connections.Spotify.VLC\Eum.Connections.Spotify.VLC.csproj" />
+      <ProjectReference Include="..\..\src\Spotify\Eum.Connections.Spotify\Eum.Connections.Spotify.csproj" />
+      <ProjectReference Include="..\..\src\Spotify\Eum.Protobufs\Eum.Protobufs.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LibVLCSharp" Version="3.6.7" />
+      <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.1" />
+    </ItemGroup>
+
+</Project>

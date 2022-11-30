@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+
+
+    <ItemGroup>
+      <PackageReference Include="Flurl.Http" Version="4.0.0-pre2" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+      <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+      <PackageReference Include="Protobuf.Text" Version="0.5.0" />
+    </ItemGroup>
+
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Eum\Eum.csproj" />
+      <ProjectReference Include="..\Eum.Connections.Spotify\Eum.Connections.Spotify.csproj" />
+    </ItemGroup>
+
+</Project>

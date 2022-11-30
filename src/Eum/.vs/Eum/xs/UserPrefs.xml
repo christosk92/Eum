@@ -1,0 +1,38 @@
+﻿<Properties StartupConfiguration="{F1FA10B1-A4F1-42E2-A9D5-530FF8869339}|Default">
+  <MonoDevelop.Ide.ItemProperties.Eum.Spotify.ConsoleTest PreferredExecutionTarget="MyMacID" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../Eum.Connections.Spotify.Playback/Player/IAudioPlayer.cs">
+    <Files>
+      <File FileName="../../samples/Eum.Spotify.ConsoleTest/Eum.Spotify.ConsoleTest.csproj" />
+      <File FileName="../../samples/Eum.Spotify.ConsoleTest/Program.cs" Line="19" Column="4" />
+      <File FileName="../../../../../../../../../usr/local/share/dotnet/packs/Microsoft.macOS.Sdk/12.3.1186-rc.2/tools/msbuild/macOS/Xamarin.Shared.targets" />
+      <File FileName="../Eum.Connections.Spotify/SpotifyClient.cs" Line="212" Column="45" />
+      <File FileName="../Eum.Connections.Spotify.NAudio/MACOS_WaveOut.cs" Line="195" Column="10" />
+      <File FileName="../Eum.Connections.Spotify.NAudio/NAudioPlayer.cs" Line="31" Column="33" />
+      <File FileName="../../../../../../../.nuget/packages/naudio.vorbis/1.5.0/contentFiles/any/netstandard2.0/README.md" Line="1" Column="1" />
+      <File FileName="../Eum.Connections.Spotify.Playback/Player/IAudioPlayer.cs" Line="21" Column="46" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Eum" expanded="True">
+            <Node name="Eum.Connections.Spotify" expanded="True" />
+            <Node name="Eum.Connections.Spotify.NAudio" expanded="True" />
+            <Node name="Eum.Connections.Spotify.Playback" expanded="True">
+              <Node name="Player" expanded="True">
+                <Node name="IAudioPlayer.cs" selected="True" />
+              </Node>
+              <Node name="Transitions" expanded="True" />
+            </Node>
+            <Node name="Eum.Spotify.ConsoleTest" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
