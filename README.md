@@ -46,8 +46,12 @@ var coreSearchResponse = await mergedCore.SearchAsync("jokjae")
 Creating a new instance of the SpotifyPlaybackClient, will notify the Connect-State that a new device has appeared.
 Like this:
 
+```csharp
+
 IAudioPlayer player = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? new EumVlcPlayer() : new NAudioPlayer());
 ISpotifyPlaybackClient playbackClient = new SpotifyPlaybackClient(spotifyClient, player);
+
+```
 
 For macOS, I recommend VLC. Make sure to add a reference to LibVlc and LibVlc.Mac in your runtime project. 
 For Windows, I recommended NAudio (not supported on osx because of waveout event).
