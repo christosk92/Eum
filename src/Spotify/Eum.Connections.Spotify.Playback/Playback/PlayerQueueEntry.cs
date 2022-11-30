@@ -260,11 +260,10 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         }
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         _closed = true;
         _spotifyClient = null;
-        _cancellationTokenSource.Cancel();
 
         try
         {
@@ -274,6 +273,8 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         {
             //ignored
         }
+
+        _cancellationTokenSource.Cancel();
     }
 
     public override string ToString()

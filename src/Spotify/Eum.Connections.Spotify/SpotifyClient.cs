@@ -25,16 +25,7 @@ using SpotifyTcp.Models;
 
 namespace Eum.Connections.Spotify;
 
-/// <summary>
-/// The main object for the Spotify connection.
-/// Register this a singleton in your IoC container. Creating a new object everytime will result in a new connection.
-/// <br/>
-/// All functions inside this class are thread safe and can be called from any thread.
-/// <br/>
-/// Make sure to authenticate before using any other functions.
-/// If you authenticate with different authentication credentials the connection will be reset using the new credentials,
-/// including any open websockets.
-/// </summary>
+/// <inheritdoc />
 public class SpotifyClient : ISpotifyClient
 {
     private SpotifyPrivateUser? _user = null;
@@ -62,6 +53,11 @@ public class SpotifyClient : ISpotifyClient
     }
 
 
+    /// <summary>
+    /// Initialize a new <see cref="ISpotifyClient"/> with a single config file.
+    /// </summary>
+    /// <param name="config"></param>
+    /// <returns></returns>
     public static SpotifyClient Create(SpotifyConfig config)
     {
         var holder = new SpotifyConnectionProvider(config);
@@ -196,21 +192,74 @@ public class SpotifyConfig
     /// </summary>
     public string? LogPath { get; init; }
 
+    /// <summary>
+    /// The hexademical representation of the device id. If this is null, a new one will be generated.
+    /// </summary>
     public string DeviceId { get; init; } = Utils.RandomHexString(40).ToLower();
+    /// <summary>
+    /// A bool indicating if the should retry a chunk if it fails. Default is true.
+    /// </summary>
     public bool RetryOnChunkError { get; set; } = true;
+    
+    /// <summary>
+    /// The path to the cache folder. If this is null, no caching will be done.
+    /// </summary>
     public string? CachePath { get; init; }
+    
+    /// <summary>
+    /// The initial volume of the player. Default is MAX_VOLUME / 2.
+    /// </summary>
     public uint InitialVolume { get; init; } = 65536 / 2;
+    
+    /// <summary>
+    /// The name of the device. Default is "Eum Desktop".
+    /// </summary>
     public string DeviceName { get; init; } = "Eum Desktop";
+    
+    /// <summary>
+    /// The type of the device. Default is "Computer".
+    /// </summary>
     public DeviceType DeviceType { get; init; } = DeviceType.Computer;
+    
+    /// <summary>
+    /// The step size of the volume. Default is VOLUME_MAX / 100.
+    /// </summary>
     public int VolumeSteps { get; init; } = 64;
-
+    
+    /// <summary>
+    /// Type of <see cref="TimeSyncMethod"/>. Default is <see cref="TimeSyncMethod.MELODY"/>. 
+    /// </summary>
     public TimeSyncMethod TimeSyncMethod { get; init; } = TimeSyncMethod.MELODY;
+    
+    /// <summary>
+    /// Whenever <see cref="TimeSyncMethod"/> is set to <see cref="TimeSyncMethod.Manual"/>, this is the offset that will be used.
+    /// </summary>
     public long TimeManualCorrection { get; set; }
+    
+    /// <summary>
+    /// Preferred bitrate.
+    /// </summary>
     public AudioQuality AudioQuality { get; set; }
+    
+    
+    /// <summary>
+    /// Normalize the volume of the audio. Default is false.
+    /// </summary>
     public bool Normalization { get; set; }
+    
+    /// <summary>
+    /// Whenever there's nothing left to play, the player will automatically start playing a new feed from Spotify. Default is true.
+    /// </summary>
     public bool AutoplayEnabled { get; set; } = true;
+    /// <summary>
+    /// Crossfade into the next track, time in milliseconds. Default is 10 seconds.
+    /// </summary>
     public int CrossfadeDuration { get; set; } = 10000;
-    public bool PreloadEnabled { get; set; }
+
+    /// <summary>
+    /// Bool indicating if the player should preload tracks.
+    /// </summary>
+    public bool PreloadEnabled { get; set; } = true;
     public bool BypassSinkVolume { get; set; }
 }
 

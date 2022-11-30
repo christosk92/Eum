@@ -10,9 +10,14 @@ using Eum.Connections.Spotify.Websocket;
 namespace Eum.Connections.Spotify;
 
 /// <summary>
-/// The general client you should be using to interact with Spotify. <br/>
-/// The first step is to perform authentication, which can be done by calling <see cref="AuthenticateAsync"/>.
-/// If the user is not authenticated, the all clients will throw an <see cref="MissingAuthenticationException"/>.
+/// The main object for the Spotify connection.
+/// Register this a singleton in your IoC container. Creating a new object everytime will result in a new connection.
+/// <br/> <br/>
+/// All functions inside this class are thread safe and can be called from any thread.
+/// <br/> <br/>
+/// Make sure to authenticate before using any other functions.
+/// If you authenticate with different authentication credentials the connection will be reset using the new credentials,
+/// including any open websockets.
 /// </summary>
 public interface ISpotifyClient : IMusicCore, IDisposable
 {

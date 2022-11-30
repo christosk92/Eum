@@ -71,7 +71,10 @@ public class EumVlcPlayer : IAudioPlayer
     public event EventHandler<(string PlaybackId, PlaybackStateType)>? StateChanged;
     public void SetVolume(string playbackid, float volume)
     {
-        throw new NotImplementedException();
+        if(_holders.TryGetValue(playbackid, out var state))
+        {
+            state.Player.Volume = (int)(volume * 100);
+        }
     }
 
     public async ValueTask InitStream(SuperAudioFormat codec,
@@ -142,7 +145,8 @@ public class EumVlcPlayer : IAudioPlayer
                 }
                 finally
                 {
-                    stopped_ended(this, null);
+                    if (!newHolder._CancellationToken.IsCancellationRequested)
+                        stopped_ended(this, null);
                 }
             });
         }
@@ -166,11 +170,18 @@ public class EumVlcPlayer : IAudioPlayer
     {
         if (_holders.TryRemove(playbackId, out var item))
         {
-            item.MediaInput.Dispose();
-            item.Player.Dispose();
-            item.Media.Dispose();
-            item._CancellationToken.Cancel();
-            item._CancellationToken.Dispose();
+            try
+            {
+                item.MediaInput.Dispose();
+                item.Player.Dispose();
+                item.Media.Dispose();
+                item._CancellationToken.Cancel();
+                item._CancellationToken.Dispose();
+            }
+            catch (Exception x)
+            {
+                
+            }
         }
     }
 
