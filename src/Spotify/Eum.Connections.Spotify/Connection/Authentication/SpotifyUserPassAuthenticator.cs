@@ -23,3 +23,25 @@ public record SpotifyUserPassAuthenticator : ISpotifyAuthentication
         };
     }
 }
+
+public class ReusableAuthenticator : ISpotifyAuthentication
+{
+    private readonly string _authDataBase64;
+    private AuthenticationType _typ;
+    private readonly string _userId;
+    public ReusableAuthenticator(string authDataBase64, AuthenticationType typ, string userId)
+    {
+        _authDataBase64 = authDataBase64;
+        _typ = typ;
+        _userId = userId;
+    }
+    public LoginCredentials GetCredentials()
+    {
+        return new LoginCredentials
+        {
+            Username = _userId,
+            AuthData = ByteString.FromBase64(_authDataBase64),
+            Typ = AuthenticationType.AuthenticationStoredSpotifyCredentials
+        };
+    }
+}

@@ -39,7 +39,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         _events = new EventsDispatcher(spotifyClient.Config, this);
         //TODO: make interface/testable
         InitState();
-
+        State.ClusterChanged += (sender, update) => ClusterChanged?.Invoke(this, update);
         _sink.StateChanged += async (sender, tuple) =>
         {
             if (tuple.PlaybackId == State.State.PlaybackId)
@@ -78,6 +78,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
     }
 
     public Cluster LatestCluster => State.LatestCluster;
+    public event EventHandler<ClusterUpdate>? ClusterChanged;
 
 
     /// <summary>

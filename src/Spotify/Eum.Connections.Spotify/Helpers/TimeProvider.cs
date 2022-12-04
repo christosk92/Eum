@@ -131,19 +131,14 @@ public class TimeProvider : ITimeProvider
             {
                 //var (drft, dt) = GetNetworkTime();
                 //var correction = ((DateTimeOffset.UtcNow - dt).TotalMilliseconds + drft);
+                using var cts = new CancellationTokenSource();
                 var corrections = new double[5];
                 NtpClient client = NtpClient.Default;
-                for (int i = 0; i < 5; i++)
-                {
-                    var correction = client.Query().CorrectionOffset
-                        .TotalMilliseconds;
-                    corrections[i] = correction;
-                }
-                
-                //calculate the average but skip the first item
-                var avg = corrections.Skip(1).Average();
-                S_Log.Instance.LogInfo($"Loaded time offset from NTP: {avg}ms");
-                _offset = avg;
+                cts.CancelAfter(TimeSpan.FromSeconds(3));
+                var correction = (await client.QueryAsync(cts.Token)).CorrectionOffset
+                    .TotalMilliseconds;
+                S_Log.Instance.LogInfo($"Loaded time offset from NTP: {correction}ms");
+                _offset = correction;
             }
         }
         catch (Exception ex)

@@ -21,10 +21,13 @@ namespace Eum.Connections.Spotify;
 /// </summary>
 public interface ISpotifyClient : IMusicCore, IDisposable
 {
+    event EventHandler<AuthenticatedSpotifyUser>? Authenticated; 
     /// <summary>
     /// The authenticated user response from Spotify. Will be null if no authentication was performed.
     /// </summary>
     new AuthenticatedSpotifyUser? AuthenticatedUser { get; }
+    new SpotifyPrivateUser? PrivateUser { get; }
+
     /// <summary>
     /// WebApi: Operations related to Spotify User Profiles. 
     /// </summary>
@@ -77,7 +80,10 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     /// to allow for a successful play to be registered.
     /// </summary>
     IEventService EventService { get; }
-    
+
+    IOpenPlaylistsClient OpenApiPlaylists { get; }
+
+    ISpClientPlaylists SpClientPlaylists { get; }
     /// <summary>
     /// Perform authentication with Spotify. <br/> <br/>
     /// Note: If the user is already authenticated, this function will have no effect. <br/>

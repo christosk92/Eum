@@ -17,6 +17,7 @@ using Eum.Connections.Spotify.Exceptions;
 using Eum.Connections.Spotify.Helpers;
 using Eum.Connections.Spotify.Models.Users;
 using Eum.Connections.Spotify.Websocket;
+using Eum.Logging;
 using Eum.Spotify.connectstate;
 using Eum.Spotify.metadata;
 using Eum.Users;
@@ -30,13 +31,12 @@ public class SpotifyClient : ISpotifyClient
 {
     private SpotifyPrivateUser? _user = null;
     private readonly ISpotifyConnectionProvider _spotifyConnectionProvider;
-    private AuthenticatedSpotifyUser _authenticatedUser;
 
     public SpotifyClient(ISpotifyConnectionProvider connectionProvider, 
         IBearerClient bearerClient,
         ISpotifyUsersClient usersClient, 
         SpotifyConfig config, IArtistClient artists, ITracksClient tracks, IAudioKeyManager audioKeyManager, 
-        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, ICacheManager? cache = null)
+        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, ICacheManager? cache = null)
     {
         BearerClient = bearerClient;
         Users = usersClient;
@@ -49,6 +49,8 @@ public class SpotifyClient : ISpotifyClient
         WebsocketState = websocketState;
         MercuryClient = mercuryClient;
         EventService = eventService;
+        OpenApiPlaylists = openApiPlaylists;
+        SpClientPlaylists = spClientPlaylists;
         Cache = cache;
     }
 
@@ -65,7 +67,9 @@ public class SpotifyClient : ISpotifyClient
         var bearer = new MercuryBearerClient(mercuryClient);
         
         var users = BuildLoggableClient<ISpotifyUsersClient>(bearer);
+        var playlists = BuildLoggableClient<IOpenPlaylistsClient>(bearer);
         var openArtists = BuildLoggableClient<IOpenArtistClient>(bearer);
+        var spClientPlaylists = BuildLoggableClient<ISpClientPlaylists>(bearer);
         var artists = new ArtistsClientWrapper(new MercuryArtistClient(mercuryClient), openArtists);
 
         var tracks = new TracksClientWrapper(null, new MercuryTracksClient(mercuryClient));
@@ -85,14 +89,17 @@ public class SpotifyClient : ISpotifyClient
         return new SpotifyClient(holder, bearer, users,  
             config, artists, tracks, audioKeyManager, 
             timeProvider, websocketState, mercuryClient,
-            new EventService(mercuryClient, timeProvider),
+            new EventService(mercuryClient, timeProvider), playlists,
+            spClientPlaylists,
             cacheManager);
     }
 
     public bool IsAuthenticated => 
         _spotifyConnectionProvider.IsConnected && _spotifyConnectionProvider.GetCurrentUser() != null;
 
-    AuthenticatedSpotifyUser ISpotifyClient.AuthenticatedUser => _spotifyConnectionProvider.GetCurrentUser() ?? throw new InvalidOperationException();
+    public event EventHandler<AuthenticatedSpotifyUser>? Authenticated;
+    AuthenticatedSpotifyUser? ISpotifyClient.AuthenticatedUser => _spotifyConnectionProvider.GetCurrentUser();
+    public SpotifyPrivateUser? PrivateUser => _user;
     public CoreType Type => CoreType.Spotify;
 
     public IUser? AuthenticatedUser => !IsAuthenticated ? null : _user;
@@ -108,19 +115,33 @@ public class SpotifyClient : ISpotifyClient
     public ITimeProvider TimeProvider { get; }
     public IMercuryClient MercuryClient { get; }
     public IEventService EventService { get; }
+    public IOpenPlaylistsClient OpenApiPlaylists { get; }
+    public ISpClientPlaylists SpClientPlaylists { get; }
 
     public async Task<AuthenticatedSpotifyUser?> AuthenticateAsync(ISpotifyAuthentication authentication)
     {
         if (_spotifyConnectionProvider.GetCurrentUser() != null)
             return _spotifyConnectionProvider.GetCurrentUser();
 
+        S_Log.Instance.LogInfo("1");
         await _spotifyConnectionProvider.GetConnectionAsync(authentication);
-
+        S_Log.Instance.LogInfo("2");
         _user = await Users.GetCurrentUser();
-        
-        await TimeProvider.Init();
+        S_Log.Instance.LogInfo("3");
+        try
+        {
+            await TimeProvider.Init();
+        }
+        catch (Exception x)
+        {
+            S_Log.Instance.LogError(x);
+        }
+
+        S_Log.Instance.LogInfo("4");
         await WebsocketState.Authenticate();
-        
+        S_Log.Instance.LogInfo("5");
+        Authenticated?.Invoke(this, _spotifyConnectionProvider.GetCurrentUser());
+        S_Log.Instance.LogInfo("6");
         return _spotifyConnectionProvider.GetCurrentUser();
     }
 
@@ -158,7 +179,9 @@ public class SpotifyClient : ISpotifyClient
 
         // if (attribute.Any(x => x is ResolvedDealerEndpoint)) return await ApResolver.GetClosestDealerAsync();
         //
-        // if (attribute.Any(x => x is ResolvedSpClientEndpoint)) return await ApResolver.GetClosestSpClient();
+        //TODO: ApResolver
+        //gae2-spclient.spotify.com:443
+        if (attribute.Any(x => x is SpClientEndpoint)) return "https://gae2-spclient.spotify.com/";
 
         if (attribute.Any(x => x is OpenUrlEndpoint)) return "https://api.spotify.com/v1";
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -166,6 +167,11 @@ public class DeviceStateHandler : IMessageListener, IRequestListener
 
             var cluster = Cluster.Parser.ParseFrom(clusterResponse);
             LatestCluster = cluster;
+            ClusterChanged?.Invoke(this, new ClusterUpdate
+            {
+                Cluster = cluster,
+                UpdateReason = ClusterUpdateReason.NewDeviceAppeared
+            });
         }
         catch (Exception x)
         {
@@ -173,6 +179,7 @@ public class DeviceStateHandler : IMessageListener, IRequestListener
         }
     }
 
+    public event EventHandler<ClusterUpdate> ClusterChanged; 
     public Cluster LatestCluster { get; private set; }
 
     public void SetIsActive(bool b)
@@ -209,6 +216,7 @@ public class DeviceStateHandler : IMessageListener, IRequestListener
             S_Log.Instance.LogInfo($"Received cluster update at {now}");
 
             LatestCluster = update.Cluster;
+            ClusterChanged?.Invoke(this, update);
             long ts = update.Cluster.Timestamp - 3000; // Workaround
             if (!_spotifyClient.Config.DeviceId.Equals(update.Cluster.ActiveDeviceId) && IsActive &&
                 now > StartedPlayingAt

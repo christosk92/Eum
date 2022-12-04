@@ -7,11 +7,11 @@ using Eum.Logging;
 
 namespace Eum.Connections.Spotify.DelegatingHandlers;
 
-internal class LoggingHandler : DelegatingHandler
+public class LoggingHandler : DelegatingHandler
 {
     private readonly IBearerClient _tokensProvider;
 
-    internal LoggingHandler(HttpClientHandler innerHandler,
+    public LoggingHandler(HttpClientHandler innerHandler,
         IBearerClient tokensProvider) : base(innerHandler)
     {
         _tokensProvider = tokensProvider;

@@ -16,7 +16,7 @@ using SpotifyTcp.Models;
 
 namespace Eum.Connections.Spotify.Clients;
 
-internal class MercuryClient : IMercuryClient
+public class MercuryClient : IMercuryClient
 {
     private int _sequenceNumber = 0;
     private readonly ISpotifyConnectionProvider _connectionHolder;

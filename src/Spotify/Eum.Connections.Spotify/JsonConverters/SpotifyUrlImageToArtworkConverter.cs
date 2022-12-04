@@ -20,6 +20,8 @@ public class SpotifyUrlImageToArtworkConverter : JsonConverter<IArtwork[]>
 
     public override void Write(Utf8JsonWriter writer, IArtwork[] value, JsonSerializerOptions options)
     {
-        throw new NotSupportedException();
+        //perform the reverse:
+        var images = value.Cast<SpotifyUrlImage>();
+        JsonSerializer.Serialize(writer, images, options);
     }
 }

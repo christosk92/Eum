@@ -33,6 +33,8 @@ public class MercuryBearerClient : IBearerClient
             {
                 "user-read-private",
                 "user-read-email",
+                "playlist-modify-public",
+                "ugc-image-upload",
                 "playlist-read",
             }, KEYMASTER_CLIENT_ID);
 

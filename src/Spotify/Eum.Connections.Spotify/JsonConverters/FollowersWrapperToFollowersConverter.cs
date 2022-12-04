@@ -8,6 +8,9 @@ public class FollowersWrapperToFollowersConverter : JsonConverter<int>
 {
     public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        if (reader.TokenType == JsonTokenType.Number &&
+            reader.TryGetInt32(out var followersTotal))
+            return followersTotal;
         //total is inside a wrapper object called followers
         reader.Read(); //start object
         reader.Read(); //href
@@ -20,6 +23,7 @@ public class FollowersWrapperToFollowersConverter : JsonConverter<int>
 
     public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
     {
-        throw new NotSupportedException();
+        //perform reverse:
+        writer.WriteNumberValue(value);
     }
 }

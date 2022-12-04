@@ -12,4 +12,6 @@ public interface ISpotifyPlaybackClient
     MetadataWrapper CurrentMetadata { get;  }
     int Time { get; }
     Cluster LatestCluster { get; }
+
+    event EventHandler<ClusterUpdate> ClusterChanged;
 }

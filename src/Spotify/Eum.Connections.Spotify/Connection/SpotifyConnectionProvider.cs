@@ -12,6 +12,7 @@ public class SpotifyConnectionProvider : ISpotifyConnectionProvider
     private AsyncLock _connectionLock = new AsyncLock();
     private SpotifyConnectionHolder? _spotifyConnectionHolder;
     private readonly SpotifyConfig? _config;
+    private ISpotifyAuthentication? _previousAuthenticator;
     public SpotifyConnectionProvider(SpotifyConfig? config)
     {
         _config = config;
@@ -48,11 +49,16 @@ public class SpotifyConnectionProvider : ISpotifyConnectionProvider
                 })
                 return _spotifyConnectionHolder.Connection;
 
+            if (_previousAuthenticator is not null)
+            {
+                authenticator = _previousAuthenticator;
+            }
             ArgumentNullException.ThrowIfNull(authenticator);
             var client = new SpotifyConnection(authenticator, _config);
 
             var user = await client.ConnectAsync(ct);
-   
+
+            _previousAuthenticator = authenticator;
             _spotifyConnectionHolder = new SpotifyConnectionHolder
             {
                 Connection = client,

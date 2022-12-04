@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -45,12 +46,26 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
         State = InitState(new PlayerState());
 
         _device.AddListener(this);
-
-        _spotifyClient.WebsocketState.AddMessageListener(this,
-            "spotify:user:attributes:update",
-            "hm://playlist/",
-            "hm://collection/collection/"
-            + spotifyClient.AuthenticatedUser.Username + "/json");
+        _device.ClusterChanged += (sender, update) => ClusterChanged?.Invoke(this, update);
+        if (spotifyClient.AuthenticatedUser is null)
+        {
+            spotifyClient.Authenticated += (sender, user) =>
+            {
+                _spotifyClient.WebsocketState.AddMessageListener(this,
+                    "spotify:user:attributes:update",
+                    "hm://playlist/",
+                    "hm://collection/collection/"
+                    + user.Username + "/json");
+            };
+        }
+        else
+        {
+            _spotifyClient.WebsocketState.AddMessageListener(this,
+                "spotify:user:attributes:update",
+                "hm://playlist/",
+                "hm://collection/collection/"
+                + spotifyClient.AuthenticatedUser.Username + "/json");
+        }
     }
 
     public AbsSpotifyContext? Context { get; private set; }
@@ -76,8 +91,8 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
 
     public long GetPosition()
     {
-        int diff = (int) (_spotifyClient.TimeProvider.CurrentTimeMillis() - State.Timestamp);
-        return Math.Max(0, (int) (State.PositionAsOfTimestamp + diff));
+        int diff = (int)(_spotifyClient.TimeProvider.CurrentTimeMillis() - State.Timestamp);
+        return Math.Max(0, (int)(State.PositionAsOfTimestamp + diff));
     }
 
     public string? ContextUri { get; }
@@ -195,13 +210,13 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
     {
         //TODO: update collections
     }
-
+    public event EventHandler<ClusterUpdate> ClusterChanged;
     public Cluster LatestCluster => _device.LatestCluster;
 
     public void SetPosition(long pos)
     {
         State.Timestamp = _spotifyClient.TimeProvider.CurrentTimeMillis();
-        State.PositionAsOfTimestamp = Math.Max(0,pos);
+        State.PositionAsOfTimestamp = Math.Max(0, pos);
         State.Position = 0L;
     }
 
@@ -233,11 +248,11 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
         var shuffle = false;
         if (State.ContextMetadata.TryGetValue("transforming.shuffle", out var shuffle_property))
             shuffle = bool.Parse(shuffle_property);
-        
+
         var willRequest = !State.Track.Metadata.ContainsKey("audio.fwdbtn.fade_overlap"); // I don't see another way to do this
         S_Log.Instance.LogInfo($"Context has transforming! url: {url}, shuffle: {shuffle}, willRequest: {willRequest}");
         if (!willRequest) return;
-        
+
         var obj = ProtoUtils.CraftContextStateCombo(State, _tracksKeeper.Tracks);
         //perform a POST http call to url
         Debugger.Break();
@@ -472,7 +487,7 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
         else State.ContextUrl = string.Empty;
 
         State.ContextMetadata.Clear();
-        foreach (var (k,v) in ctx.Metadata)
+        foreach (var (k, v) in ctx.Metadata)
         {
             State.ContextMetadata[k] = v;
         }
@@ -686,7 +701,7 @@ public class PagesLoader
     public static PagesLoader From(ISpotifyClient session, Context context)
     {
         List<ContextPage> pages = context.Pages.ToList();
-        if (!pages.Any()) 
+        if (!pages.Any())
             return From(session, context.Uri);
 
         var loader = new PagesLoader(session);

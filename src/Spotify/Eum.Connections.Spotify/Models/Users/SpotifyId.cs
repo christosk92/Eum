@@ -193,7 +193,7 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
                     Type = (EntityType)GetType(s.Current.Line);
                     break;
             }
-
+            
             i++;
         }
 
@@ -255,6 +255,7 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
             "playlist" => 7,
             "collection" => 8,
             "user" => 9,
+            "local" => 10,
             _ => 0,
         };
     }

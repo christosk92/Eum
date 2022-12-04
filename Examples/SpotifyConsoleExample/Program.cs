@@ -21,8 +21,8 @@ try
     });
     S_Log.Instance.InitializeDefaults(Path.Combine(dataDir, "Logs.txt"), null);
     var authenticated = await
-        spotifyClient.AuthenticateAsync(new SpotifyUserPassAuthenticator("XX",
-            "XX"));
+        spotifyClient.AuthenticateAsync(new SpotifyUserPassAuthenticator("christos@marteco.nl",
+            "$nXOM$k?Vz(BaTSmIPcn"));
 // var test = await spotifyClient.MercuryClient
 //     .SendAndReceiveResponseAsync(
 //         "hm://context-resolve/v1/spotify:playlist:2mYemlac8Mf4rb4OqxTVmh?sessionId=1671349537118&mode=enhanced");

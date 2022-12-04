@@ -10,3 +10,11 @@ public class OpenUrlEndpoint
     : Attribute
 {
 }
+/// <summary>
+///     Specify a Base URL for an entire Refit interface
+/// </summary>
+[AttributeUsage(AttributeTargets.Interface)]
+public class SpClientEndpoint
+    : Attribute
+{
+}

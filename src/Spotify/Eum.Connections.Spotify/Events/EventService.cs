@@ -57,7 +57,7 @@ namespace Eum.Connections.Spotify.Clients
     {
         private readonly IMercuryClient _session;
         private readonly ITimeProvider _timeProvider;
-        internal EventService(IMercuryClient session, ITimeProvider timeProvider)
+        public EventService(IMercuryClient session, ITimeProvider timeProvider)
         {
             _session = session;
             _timeProvider = timeProvider;

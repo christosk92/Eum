@@ -16,7 +16,7 @@ using Uri = System.Uri;
 namespace Eum.Connections.Spotify.Websocket
 {
 
-    internal class SpotifyWebSocket : ISpotifyWebsocket
+    public class SpotifyWebSocket : ISpotifyWebsocket
     {
         private bool _wasConnected;
         private IDisposable[] _disposables = new IDisposable[2];
@@ -45,7 +45,7 @@ namespace Eum.Connections.Spotify.Websocket
         /// A boolean flag that indicates whether we're waiting for a Connection Id. <br/>
         /// When set to true, the next "connection id" message will result in a similarevent.
         /// </summary>
-        public bool WaitingForConnectionId { get; private set; }
+        public bool WaitingForConnectionId { get; private set; } = true;
 
         /// <summary>
         /// The string connection id for the Dealer connection.
