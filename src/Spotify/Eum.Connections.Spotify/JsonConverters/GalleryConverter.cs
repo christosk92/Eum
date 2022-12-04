@@ -40,7 +40,7 @@ public class GalleryConverter : JsonConverter<IList<string>>
                     {
                         reader.Read();
                         images.Add(reader.GetString());
-                        break;
+                        //break;
                     }
                 }
             }
