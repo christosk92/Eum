@@ -13,6 +13,8 @@ namespace Eum.Connections.Spotify.Clients.Contracts
         [Get("/playlist/v2/user/{userId}/rootlist")]
         Task<HttpResponseMessage> GetPlaylists(string userId, 
             GetPlaylistsRequest request, CancellationToken ct = default);
+        [Get("/playlist/v2/playlist/{playlistId}")]
+        Task<HttpResponseMessage> GetPlaylist(string playlistId,CancellationToken ct = default);
     }
 
     public class GetPlaylistsRequest

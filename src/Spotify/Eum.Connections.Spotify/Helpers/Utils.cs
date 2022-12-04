@@ -113,7 +113,7 @@ public static class Utils
         return new string(hexChars, newOffset * 2, hexChars.Length - newOffset * 2);
     }
 
-    public static byte[] HexToBytes(string str)
+    public static byte[] HexToBytes(this string str)
     {
         var len = str.Length;
         var data = new byte[len / 2];

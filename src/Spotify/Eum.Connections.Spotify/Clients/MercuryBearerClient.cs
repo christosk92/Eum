@@ -35,7 +35,9 @@ public class MercuryBearerClient : IBearerClient
                 "user-read-email",
                 "playlist-modify-public",
                 "ugc-image-upload",
-                "playlist-read",
+                "playlist-read-private",
+                "playlist-read-collaborative",
+                "playlist-read"
             }, KEYMASTER_CLIENT_ID);
 
             var newTokenResponse = await _mercuryClient.SendAndReceiveResponseAsync(
