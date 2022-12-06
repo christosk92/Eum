@@ -133,7 +133,7 @@ public class TimeProvider : ITimeProvider
                 //var correction = ((DateTimeOffset.UtcNow - dt).TotalMilliseconds + drft);
                 using var cts = new CancellationTokenSource();
                 var corrections = new double[5];
-                NtpClient client = NtpClient.Default;
+                var client = new NtpClient("time.google.com");
                 cts.CancelAfter(TimeSpan.FromSeconds(3));
                 var correction = (await client.QueryAsync(cts.Token)).CorrectionOffset
                     .TotalMilliseconds;

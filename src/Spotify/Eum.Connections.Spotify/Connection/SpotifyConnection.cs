@@ -324,6 +324,7 @@ public class SpotifyConnection : ISpotifyConnection
         }
     }
 
+    private readonly AsyncLock _packageHandlerLock = new AsyncLock();
     private async Task StartPackageListener()
     {
         while (!_waitForPackagesCts.IsCancellationRequested)
@@ -332,55 +333,61 @@ public class SpotifyConnection : ISpotifyConnection
             {
                 var (cmd, payload) = await _tcpClient!.WaitForPacketAsync(_waitForPackagesCts.Token);
 
-                switch (cmd)
+                _ = Task.Run(async() =>
                 {
-                    case MercuryPacketType.Ping:
-                        S_Log.Instance.LogInfo("Receiving ping..");
-                        try
+                    using (await _packageHandlerLock.LockAsync())
+                    {
+                        switch (cmd)
                         {
-                            using var timeoutToken = new CancellationTokenSource();
-                            using var linked =
-                                CancellationTokenSource.CreateLinkedTokenSource(timeoutToken.Token,
-                                    _waitForPackagesCts.Token);
-                            timeoutToken.CancelAfter(TimeSpan.FromSeconds(5));
-                            await _tcpClient.SendPacketAsync(new MercuryPacket(MercuryPacketType.Pong,
-                                payload), linked.Token);
-                        }
-                        catch (IOException ex)
-                        {
-                            S_Log.Instance.LogError("Failed sending Pong!", ex);
-                            Debugger.Break();
-                            //TODO: Reconnect
-                        }
+                            case MercuryPacketType.Ping:
+                                S_Log.Instance.LogInfo("Receiving ping..");
+                                try
+                                {
+                                    using var timeoutToken = new CancellationTokenSource();
+                                    using var linked =
+                                        CancellationTokenSource.CreateLinkedTokenSource(timeoutToken.Token,
+                                            _waitForPackagesCts.Token);
+                                    timeoutToken.CancelAfter(TimeSpan.FromSeconds(5));
+                                    await _tcpClient.SendPacketAsync(new MercuryPacket(MercuryPacketType.Pong,
+                                        payload), linked.Token);
+                                }
+                                catch (IOException ex)
+                                {
+                                    S_Log.Instance.LogError("Failed sending Pong!", ex);
+                                    Debugger.Break();
+                                    //TODO: Reconnect
+                                }
 
-                        break;
-                    case MercuryPacketType.CountryCode:
-                        var countryCode = Encoding.UTF8.GetString(payload);
-                        CountryCode = countryCode;
-                        _waitForCountryCode.Set();
-                        S_Log.Instance.LogInfo($"CountryCode: {countryCode}");
-                        //ReceivedCountryCode = countryCode;
-                        break;
-                    case MercuryPacketType.PongAck:
-                        break;
-                    case MercuryPacketType.MercuryReq:
-                    case MercuryPacketType.MercurySub:
-                    case MercuryPacketType.MercuryUnsub:
-                    case MercuryPacketType.MercuryEvent:
-                        //Handle mercury packet..
-                        PacketReceived?.Invoke(this, new MercuryPacket(cmd, payload));
-                        // con.HandleMercury(newPacket);
-                        break;
-                    case MercuryPacketType.AesKeyError:
-                    case MercuryPacketType.AesKey:
-                        KeyReceived?.Invoke(this, new MercuryPacket(cmd, payload));
-                        // HandleAesKey(newPacket);
-                        break;
-                    case MercuryPacketType.ProductInfo:
-                        ProductInfo = ParseProductInfo(payload);
-                        _waitForProductInfo.Set();
-                        break;
-                }
+                                break;
+                            case MercuryPacketType.CountryCode:
+                                var countryCode = Encoding.UTF8.GetString(payload);
+                                CountryCode = countryCode;
+                                _waitForCountryCode.Set();
+                                S_Log.Instance.LogInfo($"CountryCode: {countryCode}");
+                                //ReceivedCountryCode = countryCode;
+                                break;
+                            case MercuryPacketType.PongAck:
+                                break;
+                            case MercuryPacketType.MercuryReq:
+                            case MercuryPacketType.MercurySub:
+                            case MercuryPacketType.MercuryUnsub:
+                            case MercuryPacketType.MercuryEvent:
+                                //Handle mercury packet..
+                                PacketReceived?.Invoke(this, new MercuryPacket(cmd, payload));
+                                // con.HandleMercury(newPacket);
+                                break;
+                            case MercuryPacketType.AesKeyError:
+                            case MercuryPacketType.AesKey:
+                                KeyReceived?.Invoke(this, new MercuryPacket(cmd, payload));
+                                // HandleAesKey(newPacket);
+                                break;
+                            case MercuryPacketType.ProductInfo:
+                                ProductInfo = ParseProductInfo(payload);
+                                _waitForProductInfo.Set();
+                                break;
+                        }
+                    }
+                });
             }
             catch (Exception e)
             {
