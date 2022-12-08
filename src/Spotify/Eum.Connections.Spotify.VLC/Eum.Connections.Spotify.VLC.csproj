@@ -1,20 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="LibVLCSharp" Version="3.6.7" />
-      <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\Eum\Eum.csproj" />
       <ProjectReference Include="..\Eum.Connections.Spotify.Playback\Eum.Connections.Spotify.Playback.csproj" />
     </ItemGroup>
-
 </Project>

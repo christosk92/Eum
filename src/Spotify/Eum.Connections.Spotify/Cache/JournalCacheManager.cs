@@ -85,7 +85,7 @@ public class JournalCacheManager : ICacheManager
                 io.Seek((long)i * CHUNK_SIZE, SeekOrigin.Begin);
 
                 byte[] buffer = new byte[CHUNK_SIZE];
-                int read = io.Read(buffer);
+                int read = io.Read(buffer,0, buffer.Length);
                 if (read != buffer.Length)
                     throw new IOException(string.Format("Couldn't read full chunk, read: {0}, needed: {1}", read,
                         buffer.Length));
@@ -169,7 +169,7 @@ public class JournalCacheManager : ICacheManager
             using (_ioLock.Lock())
             {
                 io.Seek((long)index * CHUNK_SIZE, SeekOrigin.Begin);
-                await io.WriteAsync(buffer);
+                await io.WriteAsync(buffer, 0, buffer.Length);
             }
 
             try

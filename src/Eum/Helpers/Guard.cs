@@ -24,9 +24,7 @@ public static class Guard
 
 		return (bool)value;
 	}
-
-	[return: NotNull]
-	public static T NotNull<T>(string parameterName, T value)
+    public static T NotNull<T>(string parameterName, T value)
 	{
 		AssertCorrectParameterName(parameterName);
 		return value ?? throw new ArgumentNullException(parameterName, "Parameter cannot be null.");
@@ -161,8 +159,7 @@ public static class Guard
 	/// If the string is null, it'll be empty.
 	/// Trims the string.
 	/// </summary>
-	[return: NotNull]
-	public static string Correct(string? str)
+    public static string Correct(string? str)
 	{
 		return string.IsNullOrWhiteSpace(str)
 			? ""

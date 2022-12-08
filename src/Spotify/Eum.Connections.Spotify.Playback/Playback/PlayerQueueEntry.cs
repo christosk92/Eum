@@ -207,7 +207,9 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
 
     private void CheckInstants(int time)
     {
-        var (key, callbackId) = _notifyInstatns.FirstOrDefault();
+        var kvp = _notifyInstatns.FirstOrDefault();
+        var key = kvp.Key;
+        var callbackId = kvp.Value;
         if (time >= key)
         {
             _notifyInstatns.Remove(key);

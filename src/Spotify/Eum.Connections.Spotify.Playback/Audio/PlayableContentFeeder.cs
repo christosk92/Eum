@@ -111,7 +111,7 @@ public class PlayableContentFeeder : IDisposable
         if(spClient.StatusCode != (int)HttpStatusCode.OK)
             throw new FeederException("Failed to resolve storage interactive");
         
-        var storageResolve = StorageResolveResponse.Parser.ParseFrom(await spClient.ResponseMessage.Content.ReadAsByteArrayAsync(ct));
+        var storageResolve = StorageResolveResponse.Parser.ParseFrom(await spClient.ResponseMessage.Content.ReadAsByteArrayAsync());
         return storageResolve;
     }
 

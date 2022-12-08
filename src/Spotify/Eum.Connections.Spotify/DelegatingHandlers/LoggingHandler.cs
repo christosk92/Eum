@@ -32,7 +32,7 @@ public class LoggingHandler : DelegatingHandler
         }
         catch (HttpRequestException ex)
         {
-            S_Log.Instance.LogError($"Request {request.Method.Method.ToUpper()} FAILED with statuscode {ex.StatusCode} -----");
+            S_Log.Instance.LogError($"Request {request.Method.Method.ToUpper()} FAILED with statuscode {ex} -----");
             throw;
         }
     }

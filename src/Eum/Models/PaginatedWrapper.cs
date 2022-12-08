@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Eum.Models;
 
 public sealed class PaginatedWrapper<T>
@@ -7,11 +5,10 @@ public sealed class PaginatedWrapper<T>
     /// <summary>
     /// A paginated collection of resources for the request.
     /// </summary>
-    [Required]
     public IEnumerable<T> Data
     {
         get;
-        init;
+        set;
     } = null!;
 
     /// <summary>
@@ -20,6 +17,6 @@ public sealed class PaginatedWrapper<T>
     public string? Next
     {
         get;
-        init;
+        set;
     }
 }

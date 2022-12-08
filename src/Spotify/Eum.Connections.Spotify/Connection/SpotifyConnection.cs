@@ -29,7 +29,7 @@ public class SpotifyConnection : ISpotifyConnection
     private readonly CancellationTokenSource _waitForPackagesCts = new CancellationTokenSource();
     private ISpotifyTcpClient? _tcpClient;
     private AuthenticatedSpotifyUser? _authenticatedSpotifyUser;
-    
+
     private readonly AsyncLock _connectionLock = new AsyncLock();
     private readonly ISpotifyAuthentication _authenticationMethod;
     private readonly SpotifyConfig? _config;
@@ -45,7 +45,7 @@ public class SpotifyConnection : ISpotifyConnection
         {
             return _tcpClient is
             {
-                IsAlive:true
+                IsAlive: true
             } && _authenticatedSpotifyUser is not null;
         }
     }
@@ -69,122 +69,15 @@ public class SpotifyConnection : ISpotifyConnection
 
     private readonly ConcurrentDictionary<long, List<byte[]>>
     _partials = new ConcurrentDictionary<long, List<byte[]>>();
-    public event EventHandler<MercuryPacket> PacketReceived;
-    public event EventHandler<MercuryPacket> KeyReceived; 
+
+    public event EventHandler<MercuryPacket> KeyReceived;
+    //
+    private ConcurrentDictionary<long, (Stopwatch Sw, Action<MercuryResponse> OnCallback)> _mercuryCallbacks = new();
     public void RegisterMercuryCallback(int sequence, Action<MercuryResponse> action)
     {
         var sw_main = Stopwatch.StartNew();
+        _mercuryCallbacks[sequence] = (sw_main, action);
         S_Log.Instance.LogInfo($"[{sequence}]: Starting to listen for mercury response");
-        void OnPacketReceived(object? sender, MercuryPacket e)
-        {
-            if (e.Cmd is MercuryPacketType.MercuryEvent or MercuryPacketType.MercuryReq or MercuryPacketType.MercurySub)
-            {
-                var sw = Stopwatch.StartNew();
-                using var stream = new MemoryStream(e.Payload);
-                int seqLength = e.Payload.getShort((int)stream.Position, true);
-                stream.Seek(2, SeekOrigin.Current);
-                long seq = 0;
-                var buffer = e.Payload;
-                switch (seqLength)
-                {
-                    case 2:
-                        seq = e.Payload.getShort((int)stream.Position, true);
-                        stream.Seek(2, SeekOrigin.Current);
-                        break;
-                    case 4:
-                        seq = e.Payload.getInt((int)stream.Position, true);
-                        stream.Seek(4, SeekOrigin.Current);
-                        break;
-                    case 8:
-                        seq = e.Payload.getLong((int)stream.Position, true);
-                        stream.Seek(8, SeekOrigin.Current);
-                        break;
-                }
-
-                if (seq == sequence)
-                {
-                    //proceed with decoding
-                    
-                    //sometimes the packages are too big to send at once, so spotify sends them in parallel, this meens we need to wait for all packages.
-                    var flags = e.Payload[(int)stream.Position];
-                    stream.Seek(1, SeekOrigin.Current);
-                    var parts = e.Payload.getShort((int)stream.Position, true);
-                    stream.Seek(2, SeekOrigin.Current);
-
-                    _partials.TryGetValue(seq, out var partial);
-                    partial ??= new List<byte[]>();
-                    if (!partial.Any() || flags == 0)
-                    {
-                        partial = new List<byte[]>();
-                        _partials.TryAdd(seq, partial);
-                    }
-
-                    
-                    S_Log.Instance.LogInfo("Handling packet, cmd: " +
-                                    $"{e.Cmd}, seq: {seq}, flags: {flags}, parts: {parts}");
-
-                    for (var j = 0; j < parts; j++)
-                    {
-                        var size = e.Payload.getShort((int)stream.Position, true);
-                        stream.Seek(2, SeekOrigin.Current);
-
-                        var buffer2 = new byte[size];
-
-                        var end = buffer2.Length;
-                        for (var z = 0; z < end; z++)
-                        {
-                            var a = e.Payload[(int)stream.Position];
-                            stream.Seek(1, SeekOrigin.Current);
-                            buffer2[z] = a;
-                        }
-
-                        partial.Add(buffer2);
-                        _partials[seq] = partial;
-                    }
-
-                    if (flags != 1)
-                    {
-                        S_Log.Instance.LogInfo($"[{seq}]: Not all parts received yet, waiting for more. Took {sw.Elapsed}");
-                        return;
-                    };        
-                    S_Log.Instance.LogInfo($"[{seq}]: All parts received, continuing. Took {sw.Elapsed}");
-
-
-                    _partials.TryRemove(seq, out partial);
-                    Header header;
-                    try
-                    {
-                        header = Header.Parser.ParseFrom(partial.First());
-                    }
-                    catch (Exception ex)
-                    {
-                        S_Log.Instance.LogError($"Couldn't parse header! bytes: {partial.First()}", ex);
-                        throw ex;
-                    }
-
-                    PacketReceived -= OnPacketReceived;
-                    var resp = new MercuryResponse(header, partial, seq);
-                    switch (e.Cmd)
-                    {
-                        case MercuryPacketType.MercuryReq:
-                            action(resp);
-                            sw_main.Stop();
-                            S_Log.Instance.LogInfo($"[{seq}]: Finished handling mercury response. Took {sw_main.Elapsed}");
-                            break;
-                        case MercuryPacketType.MercuryEvent:
-                            //Debug.WriteLine();
-                            break;
-                        default:
-                            Debugger.Break();
-                            break;
-                    }
-
-                    return;
-                }
-                //not our package.
-            }
-        }
-        PacketReceived += OnPacketReceived;
     }
 
     public void RegisterKeyCallback(int sequence, Action<AesKeyResponse> action)
@@ -197,7 +90,7 @@ public class SpotifyConnection : ISpotifyConnection
                 using var payload = new MemoryStream(e.Payload);
                 var seq = 0;
                 var buffer = e.Payload;
-                seq = e.Payload.getInt((int) payload.Position, true);
+                seq = e.Payload.getInt((int)payload.Position, true);
                 if (seq == sequence)
                 {
                     payload.Seek(4, SeekOrigin.Current);
@@ -256,7 +149,7 @@ public class SpotifyConnection : ISpotifyConnection
                 };
                 throw new SpotifyConnectionException(apresponsemsg);
             }
-            
+
             static Os GetOperatingSystem()
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -277,7 +170,7 @@ public class SpotifyConnection : ISpotifyConnection
                 return Os.Linux;
             }
 
-            
+
             var cpuFamily = CpuFamily.CpuX8664;
             var os = GetOperatingSystem();
 
@@ -293,16 +186,16 @@ public class SpotifyConnection : ISpotifyConnection
                 },
                 VersionString = "eum 1"
             };
-            
+
             var loginPacket = new MercuryPacket(MercuryPacketType.Login, packet.ToByteArray());
             await newTcpClient.SendPacketAsync(loginPacket, timeoutToken.Token);
 
             var (cmd, payload) = await newTcpClient.WaitForPacketAsync(linkedToken.Token);
 
             _tcpClient = newTcpClient;
-            _ =  Task.Run(async ()=> await StartPackageListener());
-            
-            var apWelcome  = cmd switch
+            _ =  Task.Run(async () => await StartPackageListener());
+
+            var apWelcome = cmd switch
             {
                 MercuryPacketType.APWelcome => APWelcome.Parser.ParseFrom(payload),
                 MercuryPacketType.AuthFailure => throw new SpotifyAuthenticationException(
@@ -333,7 +226,7 @@ public class SpotifyConnection : ISpotifyConnection
             {
                 var (cmd, payload) = await _tcpClient!.WaitForPacketAsync(_waitForPackagesCts.Token);
 
-                _ = Task.Run(async() =>
+                _ = Task.Run(async () =>
                 {
                     using (await _packageHandlerLock.LockAsync())
                     {
@@ -373,7 +266,108 @@ public class SpotifyConnection : ISpotifyConnection
                             case MercuryPacketType.MercuryUnsub:
                             case MercuryPacketType.MercuryEvent:
                                 //Handle mercury packet..
-                                PacketReceived?.Invoke(this, new MercuryPacket(cmd, payload));
+                                Task.Run(() =>
+                                {
+                                    var sw = Stopwatch.StartNew();
+                                    using var stream = new MemoryStream(payload);
+                                    int seqLength = payload.getShort((int)stream.Position, true);
+                                    stream.Seek(2, SeekOrigin.Current);
+                                    long seq = 0;
+                                    var buffer = payload;
+                                    switch (seqLength)
+                                    {
+                                        case 2:
+                                            seq = payload.getShort((int)stream.Position, true);
+                                            stream.Seek(2, SeekOrigin.Current);
+                                            break;
+                                        case 4:
+                                            seq = payload.getInt((int)stream.Position, true);
+                                            stream.Seek(4, SeekOrigin.Current);
+                                            break;
+                                        case 8:
+                                            seq = payload.getLong((int)stream.Position, true);
+                                            stream.Seek(8, SeekOrigin.Current);
+                                            break;
+                                    }
+
+                                    //proceed with decoding
+
+                                    //sometimes the packages are too big to send at once, so spotify sends them in parallel, this meens we need to wait for all packages.
+                                    var flags = payload[(int)stream.Position];
+                                    stream.Seek(1, SeekOrigin.Current);
+                                    var parts = payload.getShort((int)stream.Position, true);
+                                    stream.Seek(2, SeekOrigin.Current);
+
+                                    _partials.TryGetValue(seq, out var partial);
+                                    partial ??= new List<byte[]>();
+                                    if (!partial.Any() || flags == 0)
+                                    {
+                                        partial = new List<byte[]>();
+                                        _partials.TryAdd(seq, partial);
+                                    }
+
+
+                                    S_Log.Instance.LogInfo("Handling packet, cmd: " +
+                                                    $"{cmd}, seq: {seq}, flags: {flags}, parts: {parts}");
+
+                                    for (var j = 0; j < parts; j++)
+                                    {
+                                        var size = payload.getShort((int)stream.Position, true);
+                                        stream.Seek(2, SeekOrigin.Current);
+
+                                        var buffer2 = new byte[size];
+
+                                        var end = buffer2.Length;
+                                        for (var z = 0; z < end; z++)
+                                        {
+                                            var a = payload[(int)stream.Position];
+                                            stream.Seek(1, SeekOrigin.Current);
+                                            buffer2[z] = a;
+                                        }
+
+                                        partial.Add(buffer2);
+                                        _partials[seq] = partial;
+                                    }
+
+                                    if (flags != 1)
+                                    {
+                                        S_Log.Instance.LogInfo($"[{seq}]: Not all parts received yet, waiting for more. Took {sw.Elapsed}");
+                                        return;
+                                    };
+                                    S_Log.Instance.LogInfo($"[{seq}]: All parts received, continuing. Took {sw.Elapsed}");
+
+
+                                    _partials.TryRemove(seq, out partial);
+                                    Header header;
+                                    try
+                                    {
+                                        header = Header.Parser.ParseFrom(partial.First());
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        S_Log.Instance.LogError($"Couldn't parse header! bytes: {partial.First()}", ex);
+                                        throw ex;
+                                    }
+                                    var resp = new MercuryResponse(header, partial, seq);
+                                    switch (cmd)
+                                    {
+                                        case MercuryPacketType.MercuryReq:
+                                            if (_mercuryCallbacks.TryRemove(seq, out var callBack))
+                                            {
+                                                callBack.Sw.Stop();
+                                                S_Log.Instance.LogInfo(
+                                                    $"[{seq}]: Finished handling mercury response. Took {callBack.Sw.Elapsed}");
+                                                callBack.OnCallback(resp);
+                                            }
+                                            break;
+                                        case MercuryPacketType.MercuryEvent:
+                                            //Debug.WriteLine();
+                                            break;
+                                        default:
+                                            Debugger.Break();
+                                            break;
+                                    }
+                                });
                                 // con.HandleMercury(newPacket);
                                 break;
                             case MercuryPacketType.AesKeyError:
@@ -424,7 +418,7 @@ public class SpotifyConnection : ISpotifyConnection
 
         return attributes;
     }
-    public IReadOnlyDictionary<string,string> ProductInfo { get; private set; }
+    public IReadOnlyDictionary<string, string> ProductInfo { get; private set; }
 
     private bool _requestedClose;
     public void CloseGracefully()

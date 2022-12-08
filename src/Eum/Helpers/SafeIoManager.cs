@@ -88,7 +88,7 @@ public class SafeIoManager : IoManager
 	/// <summary>
 	/// Source: https://stackoverflow.com/questions/7957544/how-to-ensure-that-data-doesnt-get-corrupted-when-saving-to-file/7957634#7957634
 	/// </summary>
-	private bool TryGetSafestFileVersion([NotNullWhen(true)] out string? safestFilePath)
+	private bool TryGetSafestFileVersion(out string? safestFilePath)
 	{
 		// If foo.data and foo.data.new exist, load foo.data; foo.data.new may be broken (e.g. power off during write).
 		bool newExists = File.Exists(NewFilePath);
@@ -124,19 +124,19 @@ public class SafeIoManager : IoManager
 	{
 		return TryGetSafestFileVersion(out _);
 	}
-
-	public new async Task WriteAllLinesAsync(IEnumerable<string> lines, CancellationToken cancellationToken = default)
-	{
-		if (!lines.Any())
-		{
-			return;
-		}
-
-		IoHelpers.EnsureContainingDirectoryExists(NewFilePath);
-
-		await File.WriteAllLinesAsync(NewFilePath, lines, cancellationToken).ConfigureAwait(false);
-		SafeMoveNewToOriginal();
-	}
+	//
+	// public new async Task WriteAllLinesAsync(IEnumerable<string> lines, CancellationToken cancellationToken = default)
+	// {
+	// 	if (!lines.Any())
+	// 	{
+	// 		return;
+	// 	}
+	//
+	// 	IoHelpers.EnsureContainingDirectoryExists(NewFilePath);
+	//
+	// 	await File.WriteAllLinesAsync(NewFilePath, lines, cancellationToken).ConfigureAwait(false);
+	// 	SafeMoveNewToOriginal();
+	// }
 
 	public void WriteAllText(string text, Encoding encoding)
 	{
@@ -150,11 +150,11 @@ public class SafeIoManager : IoManager
 		File.WriteAllText(NewFilePath, text, encoding);
 		SafeMoveNewToOriginal();
 	}
-
-	public new async Task<string[]> ReadAllLinesAsync(CancellationToken cancellationToken = default)
-	{
-		return await ReadAllLinesAsync(GetSafestFilePath(), cancellationToken).ConfigureAwait(false);
-	}
+	//
+	// public new async Task<string[]> ReadAllLinesAsync(CancellationToken cancellationToken = default)
+	// {
+	// 	return await ReadAllLinesAsync(GetSafestFilePath(), cancellationToken).ConfigureAwait(false);
+	// }
 
 	public string ReadAllText(Encoding encoding)
 	{

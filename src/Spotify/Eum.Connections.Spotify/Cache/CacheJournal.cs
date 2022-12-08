@@ -230,7 +230,8 @@ internal class CacheEntry : IDisposable
     public void WriteId()
     {
         _fs.Seek(_offset, SeekOrigin.Begin);
-        _fs.Write(Encoding.ASCII.GetBytes(_id));
+        var toWRite = Encoding.ASCII.GetBytes(_id);
+        _fs.Write(toWRite, 0, toWRite.Length);
         _fs.Write(CacheJournal.ZERO_ARRAY, 0,
             CacheJournal.JOURNAL_ENTRY_SIZE - _id.Length);
     }
@@ -258,7 +259,7 @@ internal class CacheEntry : IDisposable
                  + (long)index * (CacheJournal.MAX_HEADER_LENGTH + 1) + 1,
             SeekOrigin.Begin);
         byte[] read = new byte[CacheJournal.MAX_HEADER_LENGTH];
-        var i = _fs.Read(read);
+        var i = _fs.Read(read, 0, read.Length);
 
         return new JournalHeader(id, trimArrayToNullTerminator(read));
     }
@@ -300,7 +301,8 @@ internal class CacheEntry : IDisposable
         var toWrite = 
             ((byte)((id & 0x0000FFFF)));
         _fs.WriteByte(toWrite);
-        _fs.Write(Encoding.ASCII.GetBytes(strValue));
+        var write = Encoding.ASCII.GetBytes(strValue);
+        _fs.Write(write, 0, write.Length);
     }
 }
 
@@ -308,6 +310,8 @@ internal class CacheEntry : IDisposable
 public record JournalHeader(int Id, string Value)
 {
     public byte[] ValueBytes => Utils.HexToBytes(Value);
+    public string Value { get; } = Value;
+    public int Id { get; } = Id;
 
     public static JournalHeader? Find(IEnumerable<JournalHeader?> headers, byte id)
     {

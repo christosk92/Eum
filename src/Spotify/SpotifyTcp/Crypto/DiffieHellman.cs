@@ -1,11 +1,13 @@
 using System;
-using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
+using Org.BouncyCastle.Math;
+using SpotifyTcp.Helpers;
 
 namespace SpotifyTcp.Crypto;
 
 internal sealed class DiffieHellman
 {
-    private static readonly BigInteger Generator = new BigInteger(2);
+    private static readonly BigInteger Generator = BigInteger.ValueOf(2);
 
     private static readonly byte[] PrimeBytes =
     {
@@ -33,29 +35,30 @@ internal sealed class DiffieHellman
     };
 
 
-    private static readonly BigInteger Prime = new(PrimeBytes, true,
-        isBigEndian: true);
+    private static readonly BigInteger Prime = new BigInteger(1, PrimeBytes);
     private readonly BigInteger _privateKey;
     private readonly BigInteger _publicKey;
 
     public DiffieHellman()
     {
-        var keyData = new byte[95 * 8];
+        var keyData = new byte[95];
         new Random().NextBytes(keyData);
-
-        _privateKey = new BigInteger(keyData, true, true);
-        _publicKey = BigInteger.ModPow(Generator, _privateKey, Prime);
+        _privateKey = new BigInteger(1, keyData);
+        _publicKey = Generator.ModPow(_privateKey, Prime);
         //_publicKey = Generator.ModPow(_privateKey, Prime);
     }
 
     internal BigInteger ComputeSharedKey(byte[] remoteKeyBytes)
     {
-        var remoteKey = new BigInteger(remoteKeyBytes, true, true);
-        return BigInteger.ModPow(remoteKey, _privateKey, Prime);
+        BigInteger remoteKey = new BigInteger(1, remoteKeyBytes);
+        return remoteKey.ModPow(_privateKey, Prime);
     }
 
     public byte[] PublicKeyArray()
     {
-        return _publicKey.ToByteArray(true, true);
+        var array = _publicKey.ToByteArray();
+        if (array[0] == 0) 
+            array = ByteExtensions.copyOfRange(array, 1, array.Length);
+        return array;
     }
 }

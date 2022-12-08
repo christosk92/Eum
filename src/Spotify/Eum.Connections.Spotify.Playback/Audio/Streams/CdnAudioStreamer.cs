@@ -56,7 +56,7 @@ public class CdnAudioStreamer : IDecodedAudioStream, IGeneralWritableStream
 
                 Size = BitConverter.ToInt32(BitConverter.IsLittleEndian
                     ? sizeHeader.Take(4).Reverse().ToArray()
-                    : sizeHeader.Take(4).ToArray()) * 4;
+                    : sizeHeader.Take(4).ToArray(), 0) * 4;
                 chunks = (Size + CHUNK_SIZE - 1) / CHUNK_SIZE;
 
                 try
@@ -93,7 +93,7 @@ public class CdnAudioStreamer : IDecodedAudioStream, IGeneralWritableStream
 
                 using var memStream = new MemoryStream(4);
                 var getBytes = (Size / 4).ToByteArray();
-                memStream.Write(getBytes);
+                memStream.Write(getBytes,0, getBytes.Length);
                 _cacheHandler?.SetHeader(AudioFileFetch.HEADER_SIZE, memStream.ToArray());
 
                 firstChunk = resp.Buffer;

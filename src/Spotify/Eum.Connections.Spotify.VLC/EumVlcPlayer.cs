@@ -45,7 +45,7 @@ public class EumVlcPlayer : IAudioPlayer
             item.Player.Pause();
         }
 
-        return ValueTask.CompletedTask;
+        return new ValueTask();
     }
     public ValueTask Resume(string playbackId)
     {
@@ -54,7 +54,7 @@ public class EumVlcPlayer : IAudioPlayer
             item.Player.Play();
         }
 
-        return ValueTask.CompletedTask;
+        return new ValueTask();
     }
 
     public void Gain(string playbackId, float getGain)

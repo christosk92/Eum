@@ -155,7 +155,7 @@ public class DeviceStateHandler : IMessageListener, IRequestListener
             //TODO: ApResolver
             //gae2-spclient.spotify.com:443
             using var bytArrayContent = new ByteArrayContent(_putState.ToByteArray());
-            await using var clusterResponse = await "https://gae2-spclient.spotify.com"
+            using var clusterResponse = await "https://gae2-spclient.spotify.com"
                 .AppendPathSegments("connect-state", "v1", "devices", _spotifyClient.Config.DeviceId)
                 .WithOAuthBearerToken((await _spotifyClient.BearerClient.GetBearerTokenAsync()))
                 .WithHeader("X-Spotify-Connection-Id", ConnectionId)

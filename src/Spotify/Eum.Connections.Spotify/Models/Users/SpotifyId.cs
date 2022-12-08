@@ -9,29 +9,7 @@ using Google.Protobuf;
 
 namespace Eum.Connections.Spotify.Models.Users;
 
-public readonly ref struct ID_TYPES
-{
-    public readonly ReadOnlySpan<char> STATION;
-    public readonly ReadOnlySpan<char> TRACK;
-    public readonly ReadOnlySpan<char> ARTIST;
-    public readonly ReadOnlySpan<char> ALBUM;
-    public readonly ReadOnlySpan<char> EPISODE;
-    public readonly ReadOnlySpan<char> SHOW;
-    public readonly ReadOnlySpan<char> PLAYLIST;
-    public readonly ReadOnlySpan<char> COLLECTION;
 
-    public ID_TYPES()
-    {
-        STATION = "station";
-        TRACK = "track";
-        ARTIST = "artist";
-        ALBUM = "album";
-        EPISODE = "episode";
-        SHOW = "show";
-        PLAYLIST = "playlist";
-        COLLECTION = "collection";
-    }
-}
 // public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
 // {
 //     public static SpotifyId With(string id, EntityType type)
@@ -173,7 +151,7 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
         unsafe
         {
             return new(
-                $"spotify:{type.ToString().ToLower()}:{new string(Id)}");
+                $"spotify:{type.ToString().ToLower()}:{Id}");
         }
     }
 
@@ -264,7 +242,7 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
     {
         unsafe
         {
-            return string.Compare(new string(x.Uri), new string(y.Uri), StringComparison.Ordinal);
+            return string.Compare(x.Uri, y.Uri, StringComparison.Ordinal);
         }
     }
 
@@ -272,7 +250,7 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
     {
         unsafe
         {
-            return string.Compare(new string(Uri), new string(other.Uri),
+            return string.Compare(Uri, other.Uri,
                 StringComparison.Ordinal);
         }
     }
@@ -281,7 +259,7 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
     {
         unsafe
         {
-            return new string(Uri) == new string(other.Uri);
+            return Uri == other.Uri;
         }
     }
 

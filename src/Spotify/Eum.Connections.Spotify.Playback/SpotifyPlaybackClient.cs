@@ -127,7 +127,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
     public ValueTask Ready()
     {
         _events.VolumeChanged(State.Volume);
-        return ValueTask.CompletedTask;
+        return new ValueTask();
     }
 
     public async ValueTask Command(CommandEndpoint endpoint, CommandBody data)
@@ -224,7 +224,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         if (!_spotifyClient.Config.BypassSinkVolume)
             _sink.SetVolume(State.State.PlaybackId, volumeNorm);
         _events.VolumeChanged(State.Volume);
-        return ValueTask.CompletedTask;
+        return new ValueTask();
     }
 
     public async ValueTask NotActive()

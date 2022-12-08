@@ -41,7 +41,7 @@ public class NAudioPlayer : IAudioPlayer
             item.WaveOut.Pause();
         }
 
-        return ValueTask.CompletedTask;
+        return new ValueTask();
     }
     public ValueTask Resume(string playbackId)
     {
@@ -50,7 +50,7 @@ public class NAudioPlayer : IAudioPlayer
             item.WaveOut.Play();
         }
 
-        return ValueTask.CompletedTask;
+        return new ValueTask();
     }
     public void Gain(string playbackId, float getGain)
     {

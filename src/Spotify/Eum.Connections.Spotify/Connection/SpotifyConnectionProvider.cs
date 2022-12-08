@@ -53,7 +53,7 @@ public class SpotifyConnectionProvider : ISpotifyConnectionProvider
             {
                 authenticator = _previousAuthenticator;
             }
-            ArgumentNullException.ThrowIfNull(authenticator);
+            //ArgumentNullException.ThrowIfNull(authenticator);
             var client = new SpotifyConnection(authenticator, _config);
 
             var user = await client.ConnectAsync(ct);

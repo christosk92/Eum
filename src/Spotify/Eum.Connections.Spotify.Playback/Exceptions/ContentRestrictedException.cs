@@ -9,15 +9,15 @@ namespace Eum.Connections.Spotify.Playback.Exceptions
     public class ContentRestrictedException : Exception
     {
 
-        public static void CheckRestrictions([NotNull] string country,
-            [NotNull] List<Restriction> restrictions)
+        public static void CheckRestrictions( string country,
+             List<Restriction> restrictions)
         {
             if (restrictions.Any(x => IsRestricted(country, x)))
                 throw new ContentRestrictedException();
         }
 
-        private static bool IsInList([NotNull] string list,
-            [NotNull] string match)
+        private static bool IsInList( string list,
+             string match)
         {
             for (var i = 0; i < list.Length; i += 2)
                 if (list.Substring(i, 2).Equals(match))
@@ -27,8 +27,8 @@ namespace Eum.Connections.Spotify.Playback.Exceptions
         }
 
         private static bool IsRestricted(
-            [NotNull] string countryCode,
-            [NotNull] Restriction restriction)
+             string countryCode,
+             Restriction restriction)
         {
             if (!restriction.HasCountriesAllowed)
                 return restriction.HasCountriesForbidden

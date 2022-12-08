@@ -11,7 +11,7 @@ namespace Eum.Connections.Spotify.Events
         private readonly string playbackId;
         private readonly ITimeProvider _timeProvider;
 
-        public NewPlaybackIdEvent([NotNull] string sessionId, [NotNull] string playbackId, ITimeProvider timeProvider)
+        public NewPlaybackIdEvent(string sessionId, string playbackId, ITimeProvider timeProvider)
         {
             this.sessionId = sessionId;
             this.playbackId = playbackId;

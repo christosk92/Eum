@@ -98,7 +98,7 @@ public class TimeProvider : ITimeProvider
 
             try
             {
-                await using var data = await "https://gae2-spclient.spotify.com"
+                using var data = await "https://gae2-spclient.spotify.com"
                     .AppendPathSegments("melody", "v1", "time")
                     .WithOAuthBearerToken((await _bearer.GetBearerTokenAsync()))
                     .GetStreamAsync();
@@ -133,9 +133,9 @@ public class TimeProvider : ITimeProvider
                 //var correction = ((DateTimeOffset.UtcNow - dt).TotalMilliseconds + drft);
                 using var cts = new CancellationTokenSource();
                 var corrections = new double[5];
-                var client = new NtpClient("time.google.com");
+                var client = new NtpClient(IPAddress.Parse("216.239.32.15"));
                 cts.CancelAfter(TimeSpan.FromSeconds(3));
-                var correction = (await client.QueryAsync(cts.Token)).CorrectionOffset
+                var correction = (await Task.Run(() => client.Query(), cts.Token)).CorrectionOffset
                     .TotalMilliseconds;
                 S_Log.Instance.LogInfo($"Loaded time offset from NTP: {correction}ms");
                 _offset = correction;

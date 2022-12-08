@@ -42,15 +42,15 @@ public class MercuryClient : IMercuryClient
 
     public async Task<MercuryResponse> SendAndReceiveResponseAsync(RawMercuryRequest req, MercuryRequestType type = MercuryRequestType.Get, CancellationToken ct = default)
     {
-         var spotifyConnection = await _connectionHolder.GetConnectionAsync(ct: ct);
+        var spotifyConnection = await _connectionHolder.GetConnectionAsync(ct: ct);
 
         var sequence = Interlocked.Increment(ref _sequenceNumber);
-        
+
         var requestPayload = req.Payload.ToArray();
         var requestHeader = req.Header;
 
         using var bytesOut = new MemoryStream();
-        var s4B = BitConverter.GetBytes((short) 4).Reverse().ToArray();
+        var s4B = BitConverter.GetBytes((short)4).Reverse().ToArray();
         bytesOut.Write(s4B, 0, s4B.Length); // Seq length
 
         var seqB = BitConverter.GetBytes(sequence).Reverse()
@@ -58,11 +58,11 @@ public class MercuryClient : IMercuryClient
         bytesOut.Write(seqB, 0, seqB.Length); // Seq
 
         bytesOut.WriteByte(1); // Flags
-        var reqpB = BitConverter.GetBytes((short) (1 + requestPayload.Length)).Reverse().ToArray();
+        var reqpB = BitConverter.GetBytes((short)(1 + requestPayload.Length)).Reverse().ToArray();
         bytesOut.Write(reqpB, 0, reqpB.Length); // Parts count
 
         var headerBytes2 = requestHeader.ToByteArray();
-        var hedBls = BitConverter.GetBytes((short) headerBytes2.Length).Reverse().ToArray();
+        var hedBls = BitConverter.GetBytes((short)headerBytes2.Length).Reverse().ToArray();
 
         bytesOut.Write(hedBls, 0, hedBls.Length); // Header length
         bytesOut.Write(headerBytes2, 0, headerBytes2.Length); // Header
@@ -71,7 +71,7 @@ public class MercuryClient : IMercuryClient
         foreach (var part in requestPayload)
         {
             // Parts
-            var l = BitConverter.GetBytes((short) part.Length).Reverse().ToArray();
+            var l = BitConverter.GetBytes((short)part.Length).Reverse().ToArray();
             bytesOut.Write(l, 0, l.Length);
             bytesOut.Write(part, 0, part.Length);
         }
@@ -97,7 +97,7 @@ public class MercuryClient : IMercuryClient
 
         var sw = Stopwatch.StartNew();
         S_Log.Instance.LogInfo($"Sending mercury request to {req.Header.Uri} with sequence {sequence} and cmd {cmd}");
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
                 await spotifyConnection.SendPacketAsync(new MercuryPacket(cmd, bytesOut.ToArray()), linkedToken.Token),
             linkedToken.Token);
         await waitForPayload.WaitAsync(linkedToken.Token);

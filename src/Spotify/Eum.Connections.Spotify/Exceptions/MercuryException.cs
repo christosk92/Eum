@@ -13,7 +13,7 @@ public sealed class MercuryException : Exception
     }
     public int StatusCode { get; }
     public Memory<byte> Response { get; }
-    public string ResponseAsStr => Encoding.UTF8.GetString(Response.Span);
+    public string ResponseAsStr => Encoding.UTF8.GetString(Response.ToArray());
 
     public override string ToString()
     {

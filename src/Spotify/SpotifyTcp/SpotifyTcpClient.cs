@@ -1,21 +1,16 @@
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Google.Protobuf;
 using Nito.AsyncEx;
 using SpotifyTcp.Contracts;
 using SpotifyTcp.Crypto;
-using System.Numerics;
 using System.Security.Cryptography;
 using SpotifyTcp.Helpers;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Eum.Logging;
 using Eum.Spotify;
+using Org.BouncyCastle.Math;
 using SpotifyTcp.Exceptions;
 using SpotifyTcp.Models;
 
@@ -81,9 +76,9 @@ public sealed class SpotifyTcpClient : ISpotifyTcpClient, IMissingAuthentication
                 .ToByteArray();
 
             // Prevent man-in-the-middle attacks: check server signature
-            var n = new BigInteger(ServerKey, true, true)
-                .ToByteArray(true, true);
-            var e = new BigInteger(65537).ToByteArray(true, true);
+            var n = new BigInteger(ServerKey)
+                .ToByteArray();
+            var e = BigInteger.ValueOf(65537).ToByteArray();
 
             using var rsa = new RSACryptoServiceProvider();
             var rsaKeyInfo = new RSAParameters
@@ -142,8 +137,8 @@ public sealed class SpotifyTcpClient : ISpotifyTcpClient, IMissingAuthentication
             var payloadLengthAsByte = BitConverter.GetBytes((short)payload.Length).Reverse().ToArray();
             using var yetAnotherBuffer = new MemoryStream(3 + payload.Length);
             yetAnotherBuffer.WriteByte((byte)cmd);
-            await yetAnotherBuffer.WriteAsync(payloadLengthAsByte, ct);
-            await yetAnotherBuffer.WriteAsync(payload, ct);
+            await yetAnotherBuffer.WriteAsync(payloadLengthAsByte, 0, payloadLengthAsByte.Length, ct);
+            await yetAnotherBuffer.WriteAsync(payload, 0, payload.Length, ct);
 
 
             var bufferBytes = yetAnotherBuffer.ToArray();
@@ -153,8 +148,8 @@ public sealed class SpotifyTcpClient : ISpotifyTcpClient, IMissingAuthentication
             sendCipher.Finish(fourBytesBuffer);
 
             var networkStream = _tcpClient.GetStream();
-            await networkStream.WriteAsync(bufferBytes, ct);
-            await networkStream.WriteAsync(fourBytesBuffer, ct);
+            await networkStream.WriteAsync(bufferBytes,0, bufferBytes.Length, ct);
+            await networkStream.WriteAsync(fourBytesBuffer, 0, fourBytesBuffer.Length, ct);
             await networkStream.FlushAsync(ct);
             sw.Stop();
             S_Log.Instance.LogInfo($"{packet.Cmd} took {sw.Elapsed} to send");
@@ -331,33 +326,43 @@ public sealed class SpotifyTcpClient : ISpotifyTcpClient, IMissingAuthentication
         accumulator.WriteByte(0x04);
 
         var lnarr = length.ToByteArray();
-        await accumulator.WriteAsync(lnarr, ct);
-        await accumulator.WriteAsync(buffer, ct);
+        await accumulator.WriteAsync(lnarr, 0, lnarr.Length, ct);
+        await accumulator.WriteAsync(buffer, 0, buffer.Length, ct);
     }
+
     private async Task<APResponseMessage> get_ap_response(MemoryStream accumulator,
         CancellationToken ct = default)
     {
-        var networkStream = _tcpClient.GetStream();
+        try
+        {
 
-        var buffer = new byte[8096];
-        var len = await networkStream.ReadAsync(buffer,
-            0, buffer.Length, ct);
+            var networkStream = _tcpClient.GetStream();
 
-
-        var tmp = new byte[len];
-        Array.Copy(buffer, tmp, len);
-        tmp = tmp.Skip(4).ToArray();
-        var lenArr = len.ToByteArray();
+            var buffer = new byte[8096];
+            var len = await networkStream.ReadAsync(buffer,
+                0, buffer.Length, ct);
 
 
-        accumulator.Write(lenArr, 0, lenArr.Length);
-        accumulator.Write(tmp, 0, tmp.Length);
-        accumulator.Position = 0;
+            var tmp = new byte[len];
+            Array.Copy(buffer, tmp, len);
+            tmp = tmp.Skip(4).ToArray();
+            var lenArr = len.ToByteArray();
 
-        var apresponse =
-            APResponseMessage.Parser.ParseFrom(tmp);
 
-        return apresponse;
+            accumulator.Write(lenArr, 0, lenArr.Length);
+            accumulator.Write(tmp, 0, tmp.Length);
+            accumulator.Position = 0;
+
+            var apresponse =
+                APResponseMessage.Parser.ParseFrom(tmp);
+
+            return apresponse;
+        }
+        catch (Exception x)
+        {
+            S_Log.Instance.LogError(x);
+            throw;
+        }
     }
 
     private async Task client_response(byte[] challenge,
@@ -398,7 +403,7 @@ public sealed class SpotifyTcpClient : ISpotifyTcpClient, IMissingAuthentication
                 {
                     var lengthOfScrap = (scrap[0] << 24) | (scrap[1] << 16) | (scrap[2] << 8) |
                                         (scrap[3] & 0xFF);
-                    var payload = new byte[lengthOfScrap]; 
+                    var payload = new byte[lengthOfScrap];
                     await networkStream.ReadCompleteAsync(payload, 0, lengthOfScrap, ct: ct);
                     var failed = APResponseMessage.Parser.ParseFrom(payload);
                     throw new SpotifyConnectionException(failed);
@@ -499,7 +504,7 @@ public sealed class SpotifyTcpClient : ISpotifyTcpClient, IMissingAuthentication
     private int _receiveCounter = -1;
     private AsyncLock _clienSendLock = new AsyncLock();
     private AsyncLock _clientReceiveLock = new AsyncLock();
-    
+
     public bool Equals(SpotifyTcpClient other)
     {
         return ConnectionId.Equals(other.ConnectionId);

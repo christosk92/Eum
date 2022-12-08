@@ -167,51 +167,41 @@ public static class EnvironmentHelpers
 
 		if (waitForExit)
 		{
-			using var process = new ProcessAsync(startInfo);
-			process.Start();
-
-			await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
-
-			if (process.ExitCode != 0)
-			{
-				S_Log.Instance.LogError($"{nameof(ShellExecAsync)} command: {cmd} exited with exit code: {process.ExitCode}, instead of 0.");
-			}
+			// using var process = new ProcessAsync(startInfo);
+			// process.Start();
+			//
+			// await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
+			//
+			// if (process.ExitCode != 0)
+			// {
+			// 	S_Log.Instance.LogError($"{nameof(ShellExecAsync)} command: {cmd} exited with exit code: {process.ExitCode}, instead of 0.");
+			// }
 		}
 		else
 		{
 			using var process = Process.Start(startInfo);
 		}
 	}
+    public static TValue? GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) =>
+        dictionary.GetValueOrDefault(key, default!);
 
-	public static bool IsFileTypeAssociated(string fileExtension)
-	{
-		// Source article: https://edi.wang/post/2019/3/4/read-and-write-windows-registry-in-net-core
+    public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
+    {
+        if (dictionary is null)
+        {
+            throw new Exception();
+        }
 
-		if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-		{
-			throw new InvalidOperationException("Operation only supported on windows.");
-		}
+        return dictionary.TryGetValue(key, out TValue? value) ? value : defaultValue;
+    }
 
-		fileExtension = fileExtension.TrimStart('.'); // Remove . if added by the caller.
-
-		using (var key = Registry.ClassesRoot.OpenSubKey($".{fileExtension}"))
-		{
-			// Read the (Default) value.
-			if (key?.GetValue(null) is not null)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static string GetFullBaseDirectory()
+    public static string GetFullBaseDirectory()
 	{
 		var fullBaseDirectory = Path.GetFullPath(AppContext.BaseDirectory);
 
 		if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
-			if (!fullBaseDirectory.StartsWith('/'))
+			if (!fullBaseDirectory.StartsWith("/"))
 			{
 				fullBaseDirectory = fullBaseDirectory.Insert(0, "/");
 			}

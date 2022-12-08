@@ -23,8 +23,8 @@ namespace Eum.Connections.Spotify.Playback.Transitions
         internal int EndedWhen = -1;
 
         internal TransitionInfo(
-            [NotNull] PlaybackMetricsReason endedReason,
-            [NotNull] PlaybackMetricsReason startedReason)
+             PlaybackMetricsReason endedReason,
+             PlaybackMetricsReason startedReason)
         {
             StartedReason = startedReason;
             EndedReason = endedReason;
@@ -37,7 +37,7 @@ namespace Eum.Connections.Spotify.Playback.Transitions
         /// <param name="withSkip"></param>
         /// <returns></returns>
         internal static TransitionInfo ContextChange(
-            [NotNull] StateWrapper state, bool withSkip)
+             StateWrapper state, bool withSkip)
         {
             var trans = new TransitionInfo(PlaybackMetricsReason.END_PLAY,
                 withSkip
@@ -52,7 +52,7 @@ namespace Eum.Connections.Spotify.Playback.Transitions
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        internal static TransitionInfo SkipTo([NotNull] StateWrapper state)
+        internal static TransitionInfo SkipTo( StateWrapper state)
         {
             var trans = new TransitionInfo(
                 PlaybackMetricsReason.END_PLAY,
@@ -66,7 +66,7 @@ namespace Eum.Connections.Spotify.Playback.Transitions
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        internal static TransitionInfo SkippedPrev([NotNull] StateWrapper state)
+        internal static TransitionInfo SkippedPrev( StateWrapper state)
         {
             var trans = new TransitionInfo(PlaybackMetricsReason.BACK_BTN, PlaybackMetricsReason.BACK_BTN);
             if (state.CurrentPlayable != null) trans.EndedWhen = (int) state.GetPosition();
@@ -78,7 +78,7 @@ namespace Eum.Connections.Spotify.Playback.Transitions
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        internal static TransitionInfo SkippedNext([NotNull] StateWrapper state)
+        internal static TransitionInfo SkippedNext( StateWrapper state)
         {
             var trans = new TransitionInfo(PlaybackMetricsReason.FORWARD_BTN, PlaybackMetricsReason.FORWARD_BTN);
             if (state.CurrentPlayable != null) trans.EndedWhen = (int)state.GetPosition();

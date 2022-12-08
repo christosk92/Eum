@@ -16,7 +16,7 @@ namespace Eum.Connections.Spotify.Clients
     {
         private readonly MemoryStream body = new MemoryStream(256);
 
-        public EventBuilder([NotNull] EventType type)
+        public EventBuilder(EventType type)
         {
             AppendNoDelimiter(type.Id.ToString());
             Append(type.Unknown.ToString());
@@ -36,7 +36,7 @@ namespace Eum.Connections.Spotify.Clients
             body.Write(bytesToWrite, 0, bytesToWrite.Length);
         }
 
-        internal static string ToString([NotNull] byte[] body)
+        internal static string ToString(byte[] body)
         {
             var result = new StringBuilder();
             foreach (var b in body)
@@ -63,14 +63,14 @@ namespace Eum.Connections.Spotify.Clients
             _timeProvider = timeProvider;
         }
 
-        public async Task Language([NotNull] string lang)
+        public async Task Language(string lang)
         {
             EventBuilder @event = new EventBuilder(EventType.LANGUAGE);
             @event.Append(lang);
             await SendEvent(@event);
         }
 
-        public async Task SendEvent([NotNull] EventBuilder builder)
+        public async Task SendEvent(EventBuilder builder)
         {
             try
             {
@@ -103,6 +103,6 @@ namespace Eum.Connections.Spotify.Clients
 
     public interface IEventService
     {
-        Task SendEvent([NotNull] EventBuilder builder);
+        Task SendEvent(EventBuilder builder);
     }
 }

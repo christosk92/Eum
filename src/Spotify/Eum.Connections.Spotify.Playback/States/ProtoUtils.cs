@@ -171,8 +171,8 @@ internal static class ProtoUtils
     }
 
     public static void EnrichTrack(
-        [NotNull] ContextTrack subject, 
-        [NotNull] ContextTrack track)
+         ContextTrack subject, 
+         ContextTrack track)
     {
         if (subject.HasUri && track.HasUri && !string.IsNullOrEmpty(subject.Uri) && !string.IsNullOrEmpty(track.Uri) 
             && !Equals(subject.Uri, track.Uri))
@@ -181,20 +181,24 @@ internal static class ProtoUtils
         if (subject.HasGid && track.HasGid && !Equals(subject.Gid, track.Gid))
             throw new Exception("Illegal Argument");
 
-        foreach (var (key, value) in track.Metadata)
+        foreach (var kvp in track.Metadata)
         {
+            var key = kvp.Key;
+            var value = kvp.Value;
             subject.Metadata[key] = value;
         }
     }
     public static void EnrichTrack(
-        [NotNull] ProvidedTrack subject,
-        [NotNull] ContextTrack track)
+         ProvidedTrack subject,
+         ContextTrack track)
     {
         if (track.HasUri && !object.Equals(subject.Uri, track.Uri))
             throw new Exception("Illegal Argument");
 
-        foreach (var (key, value) in track.Metadata)
+        foreach (var kvp in track.Metadata)
         {
+            var key = kvp.Key;
+            var value = kvp.Value;
             subject.Metadata[key] = value;
         }
     }

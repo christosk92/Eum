@@ -11,6 +11,7 @@ using Eum.Connections.Spotify.Playback.Audio;
 using Eum.Connections.Spotify.Playback.Contexts;
 using Eum.Connections.Spotify.Websocket;
 using Eum.Enums;
+using Eum.Library.Logger.Helpers;
 using Eum.Logging;
 using Eum.Spotify.connectstate;
 using Eum.Spotify.context;
@@ -116,7 +117,7 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
     public ValueTask Command(CommandEndpoint endpoint, CommandBody data)
     {
         //not interested
-        return ValueTask.CompletedTask;
+        return new ValueTask();
     }
 
     public async ValueTask VolumeChanged()
@@ -487,8 +488,10 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
         else State.ContextUrl = string.Empty;
 
         State.ContextMetadata.Clear();
-        foreach (var (k, v) in ctx.Metadata)
+        foreach (var kvp in ctx.Metadata)
         {
+            var k = kvp.Key;
+            var v = kvp.Value;
             State.ContextMetadata[k] = v;
         }
         Pages = PagesLoader.From(_spotifyClient, ctx);

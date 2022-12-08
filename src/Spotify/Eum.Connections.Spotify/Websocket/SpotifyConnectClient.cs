@@ -233,7 +233,7 @@ public class SpotifyConnectClient : ISpotifyConnectClient
         }
     }
 
-    async Task SendReply([NotNull] string key, [NotNull] RequestResult result)
+    async Task SendReply(string key, RequestResult result)
     {
         var success = result == RequestResult.SUCCESS;
         var reply = string.Format("{{\"type\":\"reply\", \"key\": \"{0}\", \"payload\": {{\"success\": {1}}}}}", key.ToLower(),

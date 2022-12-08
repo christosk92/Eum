@@ -13,8 +13,8 @@ namespace Eum.Connections.Spotify.Playback.States
             Uri = uri;
         }
         public string Uri { get; }
-        public static void PutAsMetadata([NotNull] ProvidedTrack builder,
-            [NotNull] ImageGroup group)
+        public static void PutAsMetadata( ProvidedTrack builder,
+             ImageGroup group)
         {
             foreach (var image in group.Image)
             {

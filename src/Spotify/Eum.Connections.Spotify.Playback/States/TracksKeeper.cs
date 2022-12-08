@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Eum.Connections.Spotify.Models.Users;
 using Eum.Connections.Spotify.Playback.Contexts;
 using Eum.Connections.Spotify.Playback.Helpers;
+using Eum.Library.Logger.Helpers;
 using Eum.Logging;
 using Eum.Spotify.connectstate;
 using Eum.Spotify.context;
@@ -500,10 +501,10 @@ public class FisherYatesShuffle<T>
         return exchanges;
     }
 
-    public void Shuffle([NotNull] List<T> list, bool saveSeed)
+    public void Shuffle( List<T> list, bool saveSeed)
         => Shuffle(list, 0, list.Count, saveSeed);
 
-    public void Shuffle([NotNull] List<T> list, int from, int to, bool saveSeed)
+    public void Shuffle( List<T> list, int from, int to, bool saveSeed)
     {
         var seed = random.Next();
         if (saveSeed) currentSeed = seed;
@@ -519,9 +520,9 @@ public class FisherYatesShuffle<T>
         }
     }
 
-    public void Unshuffle([NotNull] List<T> list) => Unshuffle(list, 0, list.Count);
+    public void Unshuffle( List<T> list) => Unshuffle(list, 0, list.Count);
 
-    public void Unshuffle([NotNull] List<T> list, int from, int to)
+    public void Unshuffle( List<T> list, int from, int to)
     {
         if (currentSeed == 0) throw new Exception("Current seed is zero!");
         if (sizeForSeed != to - from) throw new Exception("Size mismatch! Cannot unshuffle.");
