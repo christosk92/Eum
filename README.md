@@ -3,7 +3,7 @@
 
 ## 🤔 Whats is this?
 
-A merged & unified music services library for .NET 6 and up.
+A merged & unified music services library for .NET Standard 2.0 and up.
 
 For [Apple Music](src/Eum.Cores.Apple) & [Spotify](src/Eum.Cores.Spotify).
 
