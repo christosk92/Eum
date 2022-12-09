@@ -153,15 +153,15 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Eum\Eum.csproj">
+    <ProjectReference Include="..\..\..\Eum\Eum.csproj">
       <Project>{CF9E4D47-B173-488C-A32C-0ACC68E0CE28}</Project>
       <Name>Eum</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Eum.Connections.Spotify.Playback\Eum.Connections.Spotify.Playback.csproj">
+    <ProjectReference Include="..\..\Eum.Connections.Spotify.Playback\Eum.Connections.Spotify.Playback.csproj">
       <Project>{F00F7BDD-7B0B-4966-9FBC-E2636845C5BC}</Project>
       <Name>Eum.Connections.Spotify.Playback</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Eum.Connections.Spotify.UWPPlayer\Eum.Connections.Spotify.UWPEffects.csproj">
+    <ProjectReference Include="..\Eum.Connections.Spotify.UWPEffects\Eum.Connections.Spotify.UWPEffects.csproj">
       <Project>{6c186001-2419-4ec5-97aa-1838f5989201}</Project>
       <Name>Eum.Connections.Spotify.UWPEffects</Name>
     </ProjectReference>

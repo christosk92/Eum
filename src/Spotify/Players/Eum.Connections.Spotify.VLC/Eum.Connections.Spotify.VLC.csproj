@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Eum\Eum.csproj" />
-      <ProjectReference Include="..\Eum.Connections.Spotify.Playback\Eum.Connections.Spotify.Playback.csproj" />
+      <ProjectReference Include="..\..\..\Eum\Eum.csproj" />
+      <ProjectReference Include="..\..\Eum.Connections.Spotify.Playback\Eum.Connections.Spotify.Playback.csproj" />
     </ItemGroup>
 </Project>
