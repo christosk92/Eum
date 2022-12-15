@@ -14,7 +14,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
     private ISpotifyClient _spotifyClient;
     private IAudioPlayer _sink;
     private readonly string _sessionId;
-    private readonly IPlayerSessionListener _listener;
+    private IPlayerSessionListener _listener;
     private readonly PlayerQueue _queue;
 
     private int _lastPlayPos = 0;
@@ -156,6 +156,8 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
         _queue.Dispose();
         _spotifyClient = null;
         _sink = null;
+        _listener.Dispose();
+        _listener = null;
     }
 
     private void Add(SpotifyId id, bool preloaded, bool play, long playFrom)
@@ -316,7 +318,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
 
 internal record EntryWithPos(PlayerQueueEntry Entry, int Pos);
 
-internal interface IPlayerSessionListener
+internal interface IPlayerSessionListener : IDisposable
 {
     SpotifyId CurrentPlayable();
     ValueTask<SpotifyId?> NextPlayable();

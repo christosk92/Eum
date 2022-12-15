@@ -15,7 +15,10 @@ public class PlayerQueue : IDisposable
         if (Head == null) Head = entry;
         else Head.SetNext(entry);
 
-        Task.Run(async () => await entry.Do(_cancellation.Token), _cancellation.Token);
+        Task.Run(async () =>
+        {
+            await entry.Do(_cancellation.Token);
+        }, _cancellation.Token);
         S_Log.Instance.LogInfo("Added to queue: " + entry);
     }
 
@@ -87,6 +90,7 @@ public class PlayerQueue : IDisposable
             Head.Clear();
 
             _cancellation.Cancel();
+            _cancellation.Dispose();
             S_Log.Instance.LogInfo("Queue has been cleared.");
         }
     }

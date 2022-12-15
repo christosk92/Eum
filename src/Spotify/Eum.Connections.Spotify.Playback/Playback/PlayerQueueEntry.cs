@@ -32,7 +32,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
     private readonly IAudioPlayer _sink;
     private ISpotifyClient _spotifyClient;
     private readonly bool _preloaded;
-    private readonly IPlayerQueueEntryListener _listener;
+    private IPlayerQueueEntryListener _listener;
 
     private IDecodedAudioStream _audioStream;
     private MetadataWrapper _metadata;
@@ -203,6 +203,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
        await waitForFinish.WaitAsync(_cancellationTokenSource.Token);
         _listener.PlaybackEnded(this);
         S_Log.Instance.LogInfo($"{this} terminated.");
+        _cancellationTokenSource.Dispose();
     }
 
     private void CheckInstants(int time)
@@ -270,13 +271,15 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         try
         {
             _sink?.Dispose(PlaybackId);
+            _audioStream?.Dispose();
+            _cancellationTokenSource?.Cancel();
+            _listener = null;
         }
         catch (Exception)
         {
             //ignored
         }
 
-        _cancellationTokenSource.Cancel();
     }
 
     public override string ToString()
@@ -379,9 +382,9 @@ public abstract class AbsQueueEntry
         {
             var tmp = Prev;
             Prev = null;
-            if (tmp != this) tmp.Clear();
+            if (tmp != this) tmp?.Clear();
         }
 
-        ((PlayerQueueEntry) this).Dispose();
+        ((PlayerQueueEntry) this)?.Dispose();
     }
 }

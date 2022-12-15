@@ -35,7 +35,7 @@ public abstract class AbsChunkedInputStream : Stream, IHaltListener
     protected abstract bool[] RequestedChunks { get; }
 
     protected abstract bool[] AvailableChunks { get; }
-    public abstract byte[][] Buffer { get; }
+    public abstract byte[][] Buffer { get; set; }
 
 
     public void Mark()

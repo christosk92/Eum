@@ -517,10 +517,10 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         }
     }
 
-    private struct PlayerSessionListener : IPlayerSessionListener
+    private class PlayerSessionListener : IPlayerSessionListener
     {
-        private readonly SpotifyPlaybackClient _events;
-        private readonly StateWrapper _state;
+        private SpotifyPlaybackClient _events;
+        private StateWrapper _state;
 
         public PlayerSessionListener(StateWrapper state, SpotifyPlaybackClient events)
         {
@@ -664,6 +664,12 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         {
             _events.EndMetrics(playbackId, reason, metrics, endedt);
             _events._events.PlaybackEnded();
+        }
+
+        public void Dispose()
+        {
+            _state = null;
+            _events = null;
         }
     }
 

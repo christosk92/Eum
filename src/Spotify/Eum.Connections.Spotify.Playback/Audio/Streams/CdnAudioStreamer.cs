@@ -204,10 +204,10 @@ internal record InternalCdnChunkResponse(byte[] Buffer, IReadOnlyNameValueList<s
 public class InternalCdnStream : AbsChunkedInputStream
 {
     private int _chunks;
-    private readonly ICacheHandler _cacheHandler;
+    private ICacheHandler _cacheHandler;
     private CdnAudioStreamer _root;
     private readonly long _size;
-    private readonly IHaltListener? _haltListener;
+    private IHaltListener? _haltListener;
 
     private readonly string _name;
     public InternalCdnStream(bool configRetryOnChunkError, int chunks, ICacheHandler cacheHandler, 
@@ -346,8 +346,8 @@ public class InternalCdnStream : AbsChunkedInputStream
     public override string TrackName => _name;
     public override int Chunks => _chunks;
     protected override bool[] RequestedChunks { get; }
-    protected override bool[] AvailableChunks { get; }
-    public override byte[][] Buffer { get; }
+    protected override bool[] AvailableChunks { get;  }
+    public override byte[][]? Buffer { get; set; }
     protected override void RequestChunkFromStream(int index)
     {
         AsyncContext.Run(() => _root.RequestChunk(index));
@@ -373,6 +373,19 @@ public class InternalCdnStream : AbsChunkedInputStream
     {
         base.Dispose(disposing);
         _root = null;
+        if (Buffer != null)
+        {
+            for (var index = 0; index < Buffer.Length; index++)
+            {
+                Buffer[index] = null;
+            }
+
+            Buffer = null;
+        }
+
+        _cacheHandler = null;
+        _haltListener = null;
+
     }
 }
 

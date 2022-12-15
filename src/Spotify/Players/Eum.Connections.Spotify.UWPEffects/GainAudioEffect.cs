@@ -45,7 +45,6 @@ namespace Eum.Connections.Spotify.UWPEffects
                 float* outputDataInFloat = (float*) outputDataInBytes;
 
                 float inputData;
-                float echoData;
 
                 // Process audio data
                 int dataInFloatLength = (int) inputBuffer.Length / sizeof(float);
