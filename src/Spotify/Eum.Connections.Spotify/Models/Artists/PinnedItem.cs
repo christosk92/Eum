@@ -5,7 +5,7 @@ using Eum.Enums;
 
 namespace Eum.Connections.Spotify.Models.Artists;
 
-public readonly struct PinnedItem
+public class PinnedItem
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     [JsonPropertyName("TYPE")]

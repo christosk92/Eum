@@ -11,12 +11,8 @@ namespace Eum.Connections.Spotify.Models.Artists;
 /// <summary>
 /// A resource object that represents the artist.
 /// </summary>
-public readonly struct MercuryArtist
+public class MercuryArtist
 {
-    public MercuryArtist()
-    {
-    }
-
     /// <summary>
     /// The spotify uri for the artist.
     /// </summary>
@@ -76,7 +72,7 @@ public readonly struct MercuryArtist
     public IList<MerchandiseItem> Merch { get; init; } = new List<MerchandiseItem>(0);
 }
 
-public readonly struct BiographyWrapper
+public class BiographyWrapper
 {
     [JsonPropertyName("text")] public string? Text { get; init; }
 }

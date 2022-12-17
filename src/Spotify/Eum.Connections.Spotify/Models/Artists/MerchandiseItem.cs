@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Eum.Connections.Spotify.Models.Artists;
 
-public readonly struct MerchandiseItem
+public class MerchandiseItem
 {
     [JsonPropertyName("name")] public string Name { get; init; }
     [JsonPropertyName("description")] public string Description { get; init; }

@@ -4,7 +4,7 @@ using Eum.Connections.Spotify.Models.Users;
 
 namespace Eum.Connections.Spotify.Models.Artists.Discography;
 
-public readonly struct DiscographyTrackArtist
+public class DiscographyTrackArtist
 {
     [JsonPropertyName("name")] public string Name { get; init; }
 

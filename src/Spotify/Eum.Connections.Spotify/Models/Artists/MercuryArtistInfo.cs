@@ -4,7 +4,7 @@ using Eum.Connections.Spotify.Models.Users;
 
 namespace Eum.Connections.Spotify.Models.Artists;
 
-public readonly struct MercuryArtistInfo
+public class MercuryArtistInfo
 {
     [JsonConverter(typeof(UriToSpotifyIdConverter))]
     [JsonPropertyName("uri")]

@@ -5,7 +5,7 @@ using Eum.Connections.Spotify.Models.Users;
 
 namespace Eum.Connections.Spotify.Models.Artists.Discography;
 
-public readonly struct DiscographyTrackRelease
+public class DiscographyTrackRelease
 {
     [JsonPropertyName("uri")]
     [JsonConverter(typeof(UriToSpotifyIdConverter))]
