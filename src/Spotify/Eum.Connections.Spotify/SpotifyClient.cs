@@ -36,7 +36,7 @@ public class SpotifyClient : ISpotifyClient
         IBearerClient bearerClient,
         ISpotifyUsersClient usersClient, 
         SpotifyConfig config, IArtistClient artists, ITracksClient tracks, IAudioKeyManager audioKeyManager, 
-        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, ICacheManager? cache = null)
+        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, IAlbumsClient albums, ICacheManager? cache = null)
     {
         BearerClient = bearerClient;
         Users = usersClient;
@@ -51,6 +51,7 @@ public class SpotifyClient : ISpotifyClient
         EventService = eventService;
         OpenApiPlaylists = openApiPlaylists;
         SpClientPlaylists = spClientPlaylists;
+        Albums = albums;
         Cache = cache;
     }
 
@@ -83,7 +84,7 @@ public class SpotifyClient : ISpotifyClient
         }
 
         var timeProvider = new TimeProvider(config, bearer);
-        
+        var albumsClientWrapper = new AlbumsCLientWrapper(new MercuryAlbumClient(mercuryClient));
         
         var websocketState = new SpotifyConnectClient(new SpotifyWebSocket(bearer), bearer);
         return new SpotifyClient(holder, bearer, users,  
@@ -91,6 +92,7 @@ public class SpotifyClient : ISpotifyClient
             timeProvider, websocketState, mercuryClient,
             new EventService(mercuryClient, timeProvider), playlists,
             spClientPlaylists,
+            albumsClientWrapper,
             cacheManager);
     }
 
@@ -108,6 +110,7 @@ public class SpotifyClient : ISpotifyClient
     public IBearerClient BearerClient { get; }
     public ITracksClient Tracks { get; }
     public IArtistClient Artists { get; }
+    public IAlbumsClient Albums { get; }
     public IAudioKeyManager AudioKeyManager { get; }
     public SpotifyConfig Config { get; }
     public ICacheManager? Cache { get; }

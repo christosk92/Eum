@@ -93,25 +93,31 @@ public class NAudioPlayer : IAudioPlayer
             // wait here until playback stops or should stop
             Task.Run(async () =>
             {
-                while (waveOut.PlaybackState != PlaybackState.Stopped &&
-                       !newHolder._CancellationToken.IsCancellationRequested)
+                try
                 {
-                    try
+                    while (waveOut.PlaybackState != PlaybackState.Stopped &&
+                           !newHolder._CancellationToken.IsCancellationRequested)
                     {
-                        await Task.Delay(100, newHolder._CancellationToken.Token);
-                        TimeChanged?.Invoke(this, (playbackId, (int)vorbisStream.CurrentTime.TotalMilliseconds));
-                    }
-                    catch (Exception x)
-                    {
-                        S_Log.Instance.LogError(x);
-                        if (newHolder._CancellationToken.IsCancellationRequested)
+                        try
                         {
-                            break;
+                            await Task.Delay(100, newHolder._CancellationToken.Token);
+                            TimeChanged?.Invoke(this, (playbackId, (int) vorbisStream.CurrentTime.TotalMilliseconds));
+                        }
+                        catch (Exception x)
+                        {
+                            S_Log.Instance.LogError(x);
+                            if (newHolder._CancellationToken.IsCancellationRequested)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
+                finally
+                {
 
-                TrackFinished?.Invoke(this, playbackId);
+                    TrackFinished?.Invoke(this, playbackId);
+                }
             });
         }
         catch (Exception x)

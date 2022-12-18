@@ -45,6 +45,8 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     /// </summary>
     IArtistClient Artists { get; }
     
+    IAlbumsClient Albums { get; }
+
     /// <summary>
     /// Mercury: Get AES audio decryption keys.
     /// Can be used to decrypt a track for playback.
@@ -84,6 +86,7 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     IOpenPlaylistsClient OpenApiPlaylists { get; }
 
     ISpClientPlaylists SpClientPlaylists { get; }
+
     /// <summary>
     /// Perform authentication with Spotify. <br/> <br/>
     /// Note: If the user is already authenticated, this function will have no effect. <br/>

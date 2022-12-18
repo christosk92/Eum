@@ -1,5 +1,7 @@
 using Eum.Connections.Spotify.Models.Token;
 using SpotifyTcp.Models;
+using System.Diagnostics.Metrics;
+using System;
 
 namespace Eum.Connections.Spotify.Helpers;
 
@@ -13,6 +15,9 @@ internal static class MercuryUrlProvider
 
     public static string Artist(string id, string locale)
         => $"hm://artist/v1/{id}/desktop?format=json&catalogue=premium&locale={locale}&cat=1";
+
+    public static string Album(string albumUri, string locale, string country)
+        => $"hm://album/v1/album-app/album/{albumUri}/desktop?country={country}&catalogue=premium&locale={locale}";
 }
 
 

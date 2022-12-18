@@ -274,6 +274,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
             _audioStream?.Dispose();
             _cancellationTokenSource?.Cancel();
             _listener = null;
+            _audioStream = null;
         }
         catch (Exception)
         {
