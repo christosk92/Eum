@@ -47,6 +47,8 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     
     IAlbumsClient Albums { get; }
 
+    IMercurySearchClient Search { get; }
+
     /// <summary>
     /// Mercury: Get AES audio decryption keys.
     /// Can be used to decrypt a track for playback.
