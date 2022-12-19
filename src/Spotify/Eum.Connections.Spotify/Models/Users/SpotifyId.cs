@@ -169,6 +169,30 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
             {
                 case 1:
                     Type = (EntityType)GetType(s.Current.Line);
+                    //'user' case is inconclusive, the uri could also be "spotify:user:31q546bk2ufm6r4csxytjx6rb7ci:playlist:7tlqtq2KZEhLK38UOSiRFj" for example
+                    //in this case, the type is actually Playlist, we need a way to check this on case 'user':
+                    //next line is the user id,
+                    //if the next line is 'playlist' then the type is Playlist
+                    //if the next line is 'collection' then the type is Collection
+                    
+                    if(Type == EntityType.User)
+                    {
+                        if(s.MoveNext())
+                        {
+                            if (s.MoveNext())
+                            {
+                                if (s.Current.Line.SequenceEqual("playlist".AsSpan()))
+                                {
+                                    Type = EntityType.Playlist;
+                                }
+                                else if (s.Current.Line.SequenceEqual("collection".AsSpan()))
+                                {
+                                    Type = EntityType.Collection;
+                                }
+                            }
+                        }
+                    }
+
                     break;
             }
             

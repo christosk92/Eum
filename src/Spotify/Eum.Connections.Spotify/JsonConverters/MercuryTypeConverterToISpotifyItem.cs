@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Eum.Connections.Spotify.Models;
 using Eum.Connections.Spotify.Models.Users;
+using Eum.Enums;
 using Flurl.Http.Configuration;
 
 namespace Eum.Connections.Spotify.JsonConverters
@@ -33,10 +34,27 @@ namespace Eum.Connections.Spotify.JsonConverters
 
             switch (id.Type)
             {
+                case EntityType.Playlist:
+                    return jsonObject.Deserialize<MercurySearchPlaylist>(jsonSerializerOptions);
+                case EntityType.Artist:
+                    return jsonObject.Deserialize<MercurySearchArtist>(jsonSerializerOptions);
                 default:
                     return new EmptySpotifyItem(id);
             }
         }
+    }
+
+    public class MercurySearchPlaylist : ISpotifyItem
+    {
+        [JsonPropertyName("uri")]
+        [JsonConverter(typeof(UriToSpotifyIdConverter))]
+        public SpotifyId Id { get; init; }
+        [JsonPropertyName("name")]
+        public string Title { get; init; }
+        public string Description => $"{Author}・{FollowersCount}";
+        public ulong FollowersCount { get; init; }
+        public string Author { get; init; }
+        public string Image { get; init; }
     }
 
     public class EmptySpotifyItem : ISpotifyItem
@@ -46,5 +64,18 @@ namespace Eum.Connections.Spotify.JsonConverters
             Id = id;
         }
         public SpotifyId Id { get; }
+        public string Title { get; }
+        public string Description { get; }
+        public string Image { get; }
+    }
+    public class MercurySearchArtist : ISpotifyItem
+    {
+        [JsonPropertyName("uri")]
+        [JsonConverter(typeof(UriToSpotifyIdConverter))]
+        public SpotifyId Id { get; init; }
+        [JsonPropertyName("name")]
+        public string Title { get; init; }
+        public string Description => null;
+        public string Image { get; init; }
     }
 }

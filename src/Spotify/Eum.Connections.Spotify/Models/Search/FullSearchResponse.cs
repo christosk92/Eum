@@ -11,7 +11,6 @@ namespace Eum.Connections.Spotify.Models.Search
     public class FullSearchResponse
     {
         public Dictionary<string, SearchHitsObject<ISpotifyItem>> Results { get; set; }
-
         public string RequestId { get; set; }
 
         public List<string> CategoriesOrder { get; set; }
