@@ -33,7 +33,7 @@ public class JournalCacheManager : ICacheManager
     {
         if (!_handlers.TryGetValue(id, out var handler))
         {
-            handler = new CacheHandler(id, GetCacheFile(_root, id), _journal);
+            handler = new CacheHandler(id, GetCacheFile(_root, id), _journal, this);
             _handlers[id] = handler;
         }
 
@@ -59,16 +59,17 @@ public class JournalCacheManager : ICacheManager
         private readonly string _streamId;
         private readonly FileStream io;
         private bool updatedTimestamp = false;
-        private readonly CacheJournal _journal;
+        private CacheJournal _journal;
+        private JournalCacheManager _cacheManager;
         public CacheHandler(string streamId, string cacheFile,
-            CacheJournal journal)
+            CacheJournal journal, JournalCacheManager journalCacheManager)
         {
             _streamId = streamId;
             _journal = journal;
             io = File.Open(cacheFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
             journal.CreateIfNeeded(streamId);
-
+            _cacheManager = journalCacheManager;
         }
         
         public byte[] GetHeader(byte id)
@@ -200,6 +201,10 @@ public class JournalCacheManager : ICacheManager
         public void Dispose()
         {
             io.Dispose();
+            _journal.Close(_streamId);
+            _journal = null;
+            _cacheManager._handlers.TryRemove(_streamId, out _);
+            _cacheManager = null;
         }
     }
 }

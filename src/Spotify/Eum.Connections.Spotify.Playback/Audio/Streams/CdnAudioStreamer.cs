@@ -383,6 +383,7 @@ public class InternalCdnStream : AbsChunkedInputStream
             Buffer = null;
         }
 
+        _cacheHandler?.Dispose();
         _cacheHandler = null;
         _haltListener = null;
 

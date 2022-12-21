@@ -31,6 +31,10 @@ public class CacheJournal : IDisposable
 
     }
 
+    public void Close(string id)
+    {
+        _cacheEntries.TryRemove(id, out _);
+    }
     public static bool CheckId(Stream io, int first, byte[] id)
     {
         for (int i = 0;
