@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Eum.Connections.Spotify.Models;
+using Eum.Connections.Spotify.Models.Artists.Discography;
 using Eum.Connections.Spotify.Models.Users;
 using Eum.Enums;
 using Flurl.Http.Configuration;
@@ -38,6 +39,8 @@ namespace Eum.Connections.Spotify.JsonConverters
                     return jsonObject.Deserialize<MercurySearchPlaylist>(jsonSerializerOptions);
                 case EntityType.Artist:
                     return jsonObject.Deserialize<MercurySearchArtist>(jsonSerializerOptions);
+                case EntityType.Track:
+                    return jsonObject.Deserialize<MercurySearchTrack>(jsonSerializerOptions);
                 default:
                     return new EmptySpotifyItem(id);
             }
@@ -77,5 +80,19 @@ namespace Eum.Connections.Spotify.JsonConverters
         public string Title { get; init; }
         public string Description => null;
         public string Image { get; init; }
+    }
+
+    public class MercurySearchTrack : ISpotifyItem
+    {
+        [JsonPropertyName("uri")]
+        [JsonConverter(typeof(UriToSpotifyIdConverter))]
+        public SpotifyId Id { get; init; }
+        [JsonPropertyName("name")]
+        public string Title { get; init; }
+        public DiscographyTrackArtist[] Artists { get; init; }
+        public DiscographyTrackArtist Album { get; init; }
+        public string Description => $"{string.Join(", ", Artists.Select(z => z.Name))}・{Album.Name}";
+        public string Image { get; init; }
+        public double Duration { get; init; }
     }
 }

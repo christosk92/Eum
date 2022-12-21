@@ -1,6 +1,7 @@
 using Eum.Artists;
+using Eum.Core.Contracts.Models;
 
-namespace Eum.Core.Contracts.Models;
+namespace Eum.Albums;
 
 public interface ITrack
 {
@@ -15,6 +16,6 @@ public interface ITrack
     string Title { get; }
     
     IAlbum Album { get; }
-    
+    int Duration { get; }
     IArtist[] Artists { get; }
 }
