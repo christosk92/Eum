@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using Eum.Artwork;
 using Eum.Connections.Spotify.Attributes;
 using Eum.Connections.Spotify.JsonConverters;
+using Eum.Connections.Spotify.Models.Track;
 using Eum.Connections.Spotify.Models.Users;
+using Eum.Connections.Spotify.Models.Views;
 using Eum.Users;
 using Refit;
 
@@ -15,6 +17,10 @@ public interface ISpotifyUsersClient
 {
     [Get("/me")]
     Task<SpotifyPrivateUser> GetCurrentUser(CancellationToken ct = default);
+
+    [Get("/me/top/tracks")]
+    Task<View<PublicSpotifyTrack>> GetTopTracks([Query]int offset = 0, [Query]int limit = 50, string time_range = "short_term",
+        CancellationToken ct = default);
 
     [Get("/users/{userId}")]
     Task<SpotifyPublicUser> GetUserOnId(string userId, CancellationToken ct = default);

@@ -29,7 +29,7 @@ public abstract class AbsChunkedInputStream : Stream, IHaltListener
         _retryOnChunkError = retryOnChunkError;
     }
 
-
+    public override bool CanTimeout => true;
     public bool Closed { get; private set; }
     public abstract int Chunks { get; }
     protected abstract bool[] RequestedChunks { get; }

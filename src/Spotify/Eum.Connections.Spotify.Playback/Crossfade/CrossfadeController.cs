@@ -172,7 +172,7 @@ public class CrossfadeController
             S_Log.Instance.LogInfo($"Cleared fade out because custom fade doesn't apply. id: {_playbackId}");
             return null;
         } else {
-            _fadeOut = _fadeOutMap[reason];
+            _fadeOutMap.TryGetValue(reason, out _fadeOut);
             _activeInterval = null;
             S_Log.Instance.LogInfo($"Changed fade out. curr: {_fadeOut}, custom: {customFade}, why: {reason}, id: {_playbackId}");
             return _fadeOut;

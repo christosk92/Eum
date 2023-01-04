@@ -23,27 +23,19 @@ public class DiscToListConverter : JsonConverter<IList<IList<DiscographyTrackRel
          */
         //we need to extract tracks from all possible discs and return a list of list of tracks
         var discs = new List<IList<DiscographyTrackRelease>>();
-        var disc = new List<DiscographyTrackRelease>();
         while (reader.Read())
         {
             if (reader.TokenType == JsonTokenType.EndArray)
             {
-                discs.Add(disc);
-                return discs;
+                break;
             }
-
-            if (reader.TokenType == JsonTokenType.StartObject)
-            {
-                disc = new List<DiscographyTrackRelease>();
-            }
-
             if (reader.TokenType == JsonTokenType.PropertyName && reader.GetString() == "tracks")
             {
                 reader.Read();
-                disc = JsonSerializer.Deserialize<List<DiscographyTrackRelease>>(ref reader, options);
+                var disc = JsonSerializer.Deserialize<List<DiscographyTrackRelease>>(ref reader, options);
+                discs.Add(disc);
             }
         }
-
         return discs;
     }
 

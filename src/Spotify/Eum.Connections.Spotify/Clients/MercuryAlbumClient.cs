@@ -27,7 +27,7 @@ namespace Eum.Connections.Spotify.Clients
                 MercuryRequestType.Get, ct);
             if (artist.StatusCode is >= 200 and < 300)
             {
-                var text = Encoding.UTF8.GetString(artist.Payload.ToArray());
+                //var text = Encoding.UTF8.GetString(artist.Payload.ToArray());
                 return JsonSerializer.Deserialize<MercuryAlbum>(artist.Payload.Span, DefaultOptions.Default);
             }
 

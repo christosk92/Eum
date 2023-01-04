@@ -6,7 +6,7 @@ using Eum.Connections.Spotify.Models.Users;
 
 namespace Eum.Connections.Spotify.Models.Artists;
 
-public class SpotifyOpenArtist : IArtist
+public class SpotifyOpenArtist : IArtist, ISpotifyItem
 {
     /// <summary>
     /// The total number of followers.
@@ -37,4 +37,9 @@ public class SpotifyOpenArtist : IArtist
     /// The artist's popularity is calculated from the popularity of all the artist's tracks.
     /// </summary>
     public int Popularity { get; init; }
+
+    SpotifyId ISpotifyItem.Id => Uri;
+    public string Title => Name;
+    public string Description => string.Empty;
+    public string Image => Artwork[0].Url;
 }

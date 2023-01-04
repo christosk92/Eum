@@ -6,5 +6,5 @@ namespace Eum.Connections.Spotify.Clients.Contracts;
 
 public interface IMercuryTracksClient
 {
-    Task<Track> GetTrack(string id, CancellationToken ct = default);
+    Task<Track> GetTrack(string id, string country, CancellationToken ct = default);
 }

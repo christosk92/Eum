@@ -67,7 +67,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
 
     public string PlaybackId { get; }
 
-    public CrossfadeController CrossfadeController { get; private set; }
+    public CrossfadeController? CrossfadeController { get; private set; }
     public PlaybackMetricsReason EndReason { get; set; } = PlaybackMetricsReason.END_PLAY;
     public SpotifyId Id { get; }
 
@@ -111,11 +111,14 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
                         $"Loaded track. Name: {_metadata.track.Name}, artists: {string.Join(", ", _metadata.track.Artist.Select(a => a.Name))} duration: {_metadata.track.Duration}, uri: {_metadata.Id.Uri}.");
                 }
 
+
                 CrossfadeController = new CrossfadeController(PlaybackId, _metadata.Duration
                     , _listener.MetadataFor(Id), _spotifyClient.Config);
-                if (CrossfadeController.HasAnyFadeOut || _spotifyClient.Config.PreloadEnabled)
+
+                if ((CrossfadeController is {HasAnyFadeOut: true}))
                     NotifyInstant(INSTANT_PRELOAD,
-                        (int) (CrossfadeController.FadeOutStartTimeMin() - TimeSpan.FromMilliseconds(20).TotalSeconds));
+                        (int) ((CrossfadeController.FadeOutStartTimeMin() -
+                                TimeSpan.FromMilliseconds(20).TotalSeconds)));
 
                 _crossfAdeGot.Set();
                 float normalizationFactor = 1.0f;
@@ -180,14 +183,22 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         {
             if (e.playbackId != PlaybackId) return;
             if (_notifyInstatns.Any()) CheckInstants(e.time);
-            _sink.Gain(PlaybackId, CrossfadeController.GetGain(e.time));
+            if (CrossfadeController != null)
+            {
+                _sink.Gain(PlaybackId, CrossfadeController.GetGain(e.time));
+            }
+            else
+            {
+                _sink.Gain(PlaybackId, 1f);
+            }
         }
 
         var waitForFinish = new AsyncManualResetEvent(false);
+
         void TrackFinished(object sender, string playbackId)
         {
             if (playbackId != PlaybackId) return;
-            
+
             var time2 = _sink.Time(PlaybackId);
             S_Log.Instance.LogInfo($"Player time offset is {_metadata.Duration - time2}, id: {PlaybackId}");
             Dispose();
@@ -200,8 +211,19 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         _sink.TrackFinished += TrackFinished;
         _sink.TimeChanged += TimeChanged;
 
-       await waitForFinish.WaitAsync(_cancellationTokenSource.Token);
-        _listener.PlaybackEnded(this);
+        try
+        {
+            await waitForFinish.WaitAsync(_cancellationTokenSource.Token);
+        }
+        catch(Exception x)
+        {
+            S_Log.Instance.LogError($"{this} terminated at waiting for finish.", x);
+        }
+        finally
+        {
+        }
+
+        _listener?.PlaybackEnded(this);
         S_Log.Instance.LogInfo($"{this} terminated.");
         _cancellationTokenSource.Dispose();
     }
@@ -243,7 +265,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
                 var original =
                     _tracksCache.TryGetValue(uri.HexId(), out var data)
                         ? data
-                        : await _spotifyClient.Tracks.MercuryTracks.GetTrack(uri.HexId(), ct);
+                        : await _spotifyClient.Tracks.MercuryTracks.GetTrack(uri.HexId(), _spotifyClient.PrivateUser.Country, ct);
                 _tracksCache[uri.HexId()] = original;
                 var feeder = new PlayableContentFeeder(_spotifyClient);
                 var track = feeder.PickAlternativeIfNecessary(original);
@@ -280,7 +302,6 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         {
             //ignored
         }
-
     }
 
     public override string ToString()

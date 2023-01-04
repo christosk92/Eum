@@ -28,6 +28,8 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     new AuthenticatedSpotifyUser? AuthenticatedUser { get; }
     new SpotifyPrivateUser? PrivateUser { get; }
 
+    IViewsClient ViewsClient { get; }
+
     /// <summary>
     /// WebApi: Operations related to Spotify User Profiles. 
     /// </summary>
@@ -48,6 +50,8 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     IAlbumsClient Albums { get; }
 
     IMercurySearchClient Search { get; }
+
+    IExtractedColorsClient Colors { get; }
 
     /// <summary>
     /// Mercury: Get AES audio decryption keys.

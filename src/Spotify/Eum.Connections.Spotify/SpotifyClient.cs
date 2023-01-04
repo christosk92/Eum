@@ -36,7 +36,7 @@ public class SpotifyClient : ISpotifyClient
         IBearerClient bearerClient,
         ISpotifyUsersClient usersClient, 
         SpotifyConfig config, IArtistClient artists, ITracksClient tracks, IAudioKeyManager audioKeyManager, 
-        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, IAlbumsClient albums, IMercurySearchClient search, ICacheManager? cache = null)
+        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, IAlbumsClient albums, IMercurySearchClient search, IViewsClient viewsClient, IExtractedColorsClient colors, ICacheManager? cache = null)
     {
         BearerClient = bearerClient;
         Users = usersClient;
@@ -53,6 +53,8 @@ public class SpotifyClient : ISpotifyClient
         SpClientPlaylists = spClientPlaylists;
         Albums = albums;
         Search = search;
+        ViewsClient = viewsClient;
+        Colors = colors;
         Cache = cache;
     }
 
@@ -72,6 +74,8 @@ public class SpotifyClient : ISpotifyClient
         var playlists = BuildLoggableClient<IOpenPlaylistsClient>(bearer);
         var openArtists = BuildLoggableClient<IOpenArtistClient>(bearer);
         var spClientPlaylists = BuildLoggableClient<ISpClientPlaylists>(bearer);
+        var viewsClient = BuildLoggableClient<IViewsClient>(bearer);
+
         var artists = new ArtistsClientWrapper(new MercuryArtistClient(mercuryClient), openArtists);
 
         var tracks = new TracksClientWrapper(null, new MercuryTracksClient(mercuryClient));
@@ -89,6 +93,7 @@ public class SpotifyClient : ISpotifyClient
         
         var websocketState = new SpotifyConnectClient(new SpotifyWebSocket(bearer), bearer);
         var search = new MercurySearchClient(mercuryClient);
+        var c = new ExtractedColorClient(bearer);
         return new SpotifyClient(holder, bearer, users,  
             config, artists, tracks, audioKeyManager, 
             timeProvider, websocketState, mercuryClient,
@@ -96,6 +101,8 @@ public class SpotifyClient : ISpotifyClient
             spClientPlaylists,
             albumsClientWrapper,
             search,
+            viewsClient,
+            c,
             cacheManager);
     }
 
@@ -105,6 +112,7 @@ public class SpotifyClient : ISpotifyClient
     public event EventHandler<AuthenticatedSpotifyUser>? Authenticated;
     AuthenticatedSpotifyUser? ISpotifyClient.AuthenticatedUser => _spotifyConnectionProvider.GetCurrentUser();
     public SpotifyPrivateUser? PrivateUser => _user;
+    public IViewsClient ViewsClient { get; }
     public CoreType Type => CoreType.Spotify;
 
     public IUser? AuthenticatedUser => !IsAuthenticated ? null : _user;
@@ -115,6 +123,7 @@ public class SpotifyClient : ISpotifyClient
     public IArtistClient Artists { get; }
     public IAlbumsClient Albums { get; }
     public IMercurySearchClient Search { get; }
+    public IExtractedColorsClient Colors { get; }
     public IAudioKeyManager AudioKeyManager { get; }
     public SpotifyConfig Config { get; }
     public ICacheManager? Cache { get; }
@@ -204,9 +213,9 @@ public class MercuryTracksClient : IMercuryTracksClient
         _mercuryClient = mercuryClient;
     }
 
-    public async Task<Track> GetTrack(string hexid, CancellationToken ct = default)
+    public async Task<Track> GetTrack(string hexid, string country, CancellationToken ct = default)
     {
-        var send = await _mercuryClient.SendAndReceiveResponseAsync($"hm://metadata/4/track/{hexid}", MercuryRequestType.Get,
+        var send = await _mercuryClient.SendAndReceiveResponseAsync($"hm://metadata/4/track/{hexid}?market=from_token&country={country}", MercuryRequestType.Get,
             ct);
         if (send.StatusCode >= 200 && send.StatusCode < 300)
             return Track.Parser.ParseFrom(send.Payload.Span);

@@ -137,7 +137,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
 
 
     public string? CurrentPlaybackId => _queue?.Head?.PlaybackId;
-    public PlayerMetrics? CurrentMetrics => _queue.Head.Metrics;
+    public PlayerMetrics? CurrentMetrics => _queue?.Head?.Metrics;
 
     public int CurrentTime
     {

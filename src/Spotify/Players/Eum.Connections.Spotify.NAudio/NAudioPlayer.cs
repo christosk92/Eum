@@ -11,11 +11,11 @@ using NAudio.Wave.SampleProviders;
 
 namespace Eum.Connections.Spotify.NAudio;
 
-public class VorbisHolder
+public class VorbisHolder : IDisposable
 {
-    public VorbisHolder(VorbisWaveReader reder, IWavePlayer waveOut, VolumeSampleProvider volumeSampler)
+    public VorbisHolder(VorbisWaveReader reader, IWavePlayer waveOut, VolumeSampleProvider volumeSampler)
     {
-        Reder = reder;
+        Reder = reader;
         WaveOut = waveOut;
         GainSampler = volumeSampler;
         _CancellationToken = new CancellationTokenSource();
@@ -26,6 +26,13 @@ public class VorbisHolder
     public VolumeSampleProvider GainSampler { get; }
 
     public CancellationTokenSource _CancellationToken;
+
+    public void Dispose()
+    {
+        _CancellationToken.Dispose();
+        Reder.Dispose();
+        WaveOut.Dispose();
+    }
 }
 
 public class NAudioPlayer : IAudioPlayer
@@ -86,9 +93,10 @@ public class NAudioPlayer : IAudioPlayer
             var newHolder = new VorbisHolder(vorbisStream, waveOut, volumeSampler);
             _holders[playbackId] = newHolder;
             waveOut.Init(volumeSampler);
-            vorbisStream.CurrentTime = TimeSpan.FromMilliseconds(playFrom);
+            if (playFrom > 0)
+                vorbisStream.CurrentTime = TimeSpan.FromMilliseconds(playFrom);
+            
             waveOut.Play();
-
 
             // wait here until playback stops or should stop
             Task.Run(async () =>
@@ -96,7 +104,8 @@ public class NAudioPlayer : IAudioPlayer
                 try
                 {
                     while (waveOut.PlaybackState != PlaybackState.Stopped &&
-                           !newHolder._CancellationToken.IsCancellationRequested)
+                           !newHolder._CancellationToken.IsCancellationRequested
+                           &&vorbisStream.Length > vorbisStream.Position)
                     {
                         try
                         {
@@ -139,11 +148,9 @@ public class NAudioPlayer : IAudioPlayer
     public void Dispose(string playbackId)
     {
         if (_holders.TryRemove(playbackId, out var item))
-        {
-            item.Reder.Dispose();
-            item.WaveOut.Dispose();
+        {          
             item._CancellationToken.Cancel();
-            item._CancellationToken.Dispose();
+            item.Dispose();
         }
     }
 

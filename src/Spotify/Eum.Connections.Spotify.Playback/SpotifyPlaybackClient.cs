@@ -454,7 +454,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         S_Log.Instance.LogInfo(
             $"Loading track, id: {State.CurrentPlayable.Value.Uri}, session: {_playerSession.SessionId}, play: {play}");
 
-        var playbackId = await _playerSession.Play(State.CurrentPlayable.Value, (int) State.GetPosition(),
+        var playbackId = await _playerSession.Play(State.CurrentPlayable.Value, getPosition ? (int) State.GetPosition() : 0,
             play,
             trans.StartedReason);
         State.State.PlaybackId = playbackId;
