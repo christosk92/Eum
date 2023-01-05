@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Runtime.InteropServices;
 using Eum.Connections.Spotify;
 using Eum.Connections.Spotify.Connection.Authentication;
 using Eum.Connections.Spotify.NAudio;
@@ -32,7 +31,7 @@ try
 
 
     var playbackClient = new SpotifyPlaybackClient(spotifyClient,
-        RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? new EumVlcPlayer() : new NAudioPlayer());
+         new EumVlcPlayer());
 //await playbackClient.TestPlayback();
     var cluster = playbackClient.LatestCluster;
     var mn = new ManualResetEvent(false);

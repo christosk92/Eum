@@ -75,6 +75,14 @@ public class CdnAudioStreamer : IDecodedAudioStream, IGeneralWritableStream
                             firstChunk = resp.Buffer;
                             fromCache = false;
                             break;
+                        case BadChunkHashException xe:
+                            S_Log.Instance.LogError("Failed getting first chunk from cache.", xe);
+
+                            var resp_new = 
+                                AsyncContext.Run(async () => await Request(0, CHUNK_SIZE - 1));
+                            firstChunk = resp_new.Buffer;
+                            fromCache = false;
+                            break;
                         default:
                             throw;
                     }

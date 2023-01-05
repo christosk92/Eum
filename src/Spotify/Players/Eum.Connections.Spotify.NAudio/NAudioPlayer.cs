@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Eum.Connections.Spotify.Playback.Audio.Streams;
 using Eum.Connections.Spotify.Playback.Enums;
 using Eum.Connections.Spotify.Playback.Player;

@@ -213,6 +213,6 @@ public class BadChunkHashException : Exception
 {
     public BadChunkHashException(object streamId, object value, byte[] hash)
     {
-        throw new NotImplementedException();
+        
     }
 }
