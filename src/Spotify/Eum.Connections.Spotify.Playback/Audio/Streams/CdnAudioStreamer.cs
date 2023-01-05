@@ -268,6 +268,27 @@ public class InternalCdnStream : AbsChunkedInputStream
         return copy;
     }
 
+    public override int Read(Span<byte> buffer)
+    {
+        if (closed)
+            return 0;
+        if (pos >= Length)
+            return -1;
+
+        //int i = 0;
+
+        int chunk = (int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE);
+        int chunkOff = (int) (pos % AesAudioDecrypt.CHUNK_SIZE);
+
+        CheckAvailability(chunk, true, false);
+        if (Buffer[chunk] == null)
+            return 0;
+        int copy = Math.Min((Buffer[chunk].Length) - (chunkOff), buffer.Length);
+        Buffer[chunk].AsSpan(chunkOff, copy).CopyTo(buffer);
+        pos += copy;
+        return copy;
+    }
+    
     public override int Read(byte[] b, int off, int len)
     {
         if (closed)
@@ -299,6 +320,40 @@ public class InternalCdnStream : AbsChunkedInputStream
         pos += copy;
         return copy;
     }
+
+
+    // public override int Read(byte[] b, int off, int len)
+    // {
+    //     return base.Read(b, off, len);
+    //     if (closed)
+    //         return 0;
+    //     
+    //     if (off < 0 || len < 0 || len > b.Length - off)
+    //     {
+    //         throw new ArgumentOutOfRangeException();
+    //     }
+    //     else if (len == 0)
+    //     {
+    //         return 0;
+    //     }
+    //     
+    //     if (pos >= Length)
+    //         return -1;
+    //     
+    //     //int i = 0;
+    //     
+    //     int chunk = (int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE);
+    //     int chunkOff = (int) (pos % AesAudioDecrypt.CHUNK_SIZE);
+    //     
+    //     CheckAvailability(chunk, true, false);
+    //     if (Buffer[chunk] == null) 
+    //         return 0;
+    //     int copy = Math.Min((Buffer[chunk].Length) - (chunkOff), len);
+    //     Array.Copy(Buffer[chunk], chunkOff,
+    //         b, off, copy);
+    //     pos += copy;
+    //     return copy;
+    // }
     // public override int Read(byte[] b, int off, int len)
     // {
     //     if (closed) throw new IOException("Stream is closed!");

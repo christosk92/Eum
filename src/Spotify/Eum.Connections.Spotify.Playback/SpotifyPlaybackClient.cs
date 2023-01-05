@@ -220,7 +220,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
     {
         var volume = State.Volume;
 
-        var volumeNorm = ((float) volume / VOLUME_MAX);
+        var volumeNorm = ((float)volume / VOLUME_MAX);
         if (!_spotifyClient.Config.BypassSinkVolume)
             _sink.SetVolume(State.State.PlaybackId, volumeNorm);
         _events.VolumeChanged(State.Volume);
@@ -327,7 +327,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         public void VolumeChanged(uint value)
         {
             if (value > VOLUME_MAX) throw new ArgumentOutOfRangeException();
-            float volume = (float) value / VOLUME_MAX;
+            float volume = (float)value / VOLUME_MAX;
 
             foreach (var listener in _listeners)
             {
@@ -439,12 +439,23 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
 
         _playerSession =
             new PlayerSession(_spotifyClient, _sink, sessionId, new PlayerSessionListener(State, this));
-        await _spotifyClient.EventService.SendEvent(new NewSessionIdEvent(sessionId, State, _spotifyClient.TimeProvider)
-            .Build());
+        await Task.Run(async () =>
+        {
+            try
+            {
+                await _spotifyClient.EventService.SendEvent(
+                    new NewSessionIdEvent(sessionId, State, _spotifyClient.TimeProvider)
+                        .Build());
+            }
+            catch (Exception ex)
+            {
+
+            }
+        });
 
         await LoadTrack(play, trans, getPosition);
     }
-//System.ArgumentException: Value does not fall within the expected range.
+    //System.ArgumentException: Value does not fall within the expected range.
 
     private async Task LoadTrack(bool play, TransitionInfo trans, bool getPosition = true)
     {
@@ -454,7 +465,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         S_Log.Instance.LogInfo(
             $"Loading track, id: {State.CurrentPlayable.Value.Uri}, session: {_playerSession.SessionId}, play: {play}");
 
-        var playbackId = await _playerSession.Play(State.CurrentPlayable.Value, getPosition ? (int) State.GetPosition() : 0,
+        var playbackId = await _playerSession.Play(State.CurrentPlayable.Value, getPosition ? (int)State.GetPosition() : 0,
             play,
             trans.StartedReason);
         State.State.PlaybackId = playbackId;
@@ -468,7 +479,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         if (play) _events.PlaybackResumed();
         else _events.PlaybackPaused();
 
-        StartMetrics(playbackId, trans.StartedReason, (int) State.GetPosition());
+        StartMetrics(playbackId, trans.StartedReason, (int)State.GetPosition());
         await _spotifyClient.EventService.SendEvent(
             new NewPlaybackIdEvent(_playerSession.SessionId, playbackId, _spotifyClient.TimeProvider).Build());
     }
@@ -578,7 +589,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
 
         public ContextTrack GetCurrentTrack()
         {
-            int index = (int) _state.State.Index.Track;
+            int index = (int)_state.State.Index.Track;
             return _state.Tracks == null
                    || _state.Tracks.Tracks.Count < index
                 ? null

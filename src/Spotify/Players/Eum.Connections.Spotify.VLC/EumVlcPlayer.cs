@@ -61,10 +61,10 @@ public class EumVlcPlayer : IAudioPlayer
     {
         if (_holders.TryGetValue(playbackId, out var state))
         {
-            state.Media.AddOption($":audio-filter=scaletempo, volume, equalizer");
-            state.Media.AddOption($":equalizer-preamp={getGain}");
-          //  state.Player.Volume = state.Player.Volume * getGain;
-            //state.VolumeSampler.Volume = getGain;
+            //I want to crossfade the audio here, that means i need to change the gain of the current playback
+            //we need to use the state.media.addoption
+            
+           // state.Media.AddOption($":audio-filter=volume:gain={getGain}");
         }
     }
 

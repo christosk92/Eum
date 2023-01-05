@@ -83,20 +83,21 @@ public class NAudioPlayer : IAudioPlayer
     {
         try
         {
-            var vorbisStream = new VorbisWaveReader(audioStreamStream);
+            var vorbisStream = new VorbisWaveReader(audioStreamStream, true);
             // var waveOut = new WaveOutEvent();
             var waveOut = new WaveOutEvent();
             var volumeSampler = new VolumeSampleProvider(vorbisStream.ToSampleProvider())
             {
                 Volume = 0
             };
+
             var newHolder = new VorbisHolder(vorbisStream, waveOut, volumeSampler);
-            _holders[playbackId] = newHolder;
             waveOut.Init(volumeSampler);
             if (playFrom > 0)
                 vorbisStream.CurrentTime = TimeSpan.FromMilliseconds(playFrom);
             
             waveOut.Play();
+            _holders[playbackId] = newHolder;
 
             // wait here until playback stops or should stop
             Task.Run(async () =>

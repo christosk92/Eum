@@ -10,7 +10,7 @@ namespace Eum.Connections.Spotify.Playback.Audio;
 
 public class AesAudioDecrypt : IAudioDecrypt 
 {
-    public static readonly int CHUNK_SIZE =2 *  128 * 1024;
+    public static readonly int CHUNK_SIZE =  128 * 1024;
 
     private static readonly byte[] AudioAesIv =
     {

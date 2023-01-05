@@ -340,6 +340,12 @@ public abstract class AbsChunkedInputStream : Stream, IHaltListener
         CheckAvailability(chunk, false, false);
         return k;
     }
+
+    protected float _gain = 1f;
+    public void Gain(float getGain)
+    {
+        _gain = getGain;
+    }
 }
 
 public interface IHaltListener

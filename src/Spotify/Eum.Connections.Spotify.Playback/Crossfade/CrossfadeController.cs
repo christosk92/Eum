@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Eum.Connections.Spotify.Models.Users;
 using Eum.Connections.Spotify.Playback.Metrics;
-using Eum.Library.Logger.Helpers;
 using Eum.Logging;
 
 namespace Eum.Connections.Spotify.Playback.Crossfade;
