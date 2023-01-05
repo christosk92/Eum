@@ -11,10 +11,10 @@ public static class Utils
     private static readonly char[] hexArray = "0123456789ABCDEF".ToCharArray();
     private static readonly string randomString = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    public static byte[] toByteArray(BigInteger i)
+    public static byte[] ToByteArray(this BigInteger i)
     {
-        var array = i.ToByteArray();
-        if (array[0] == 0) array = ByteExtensions.copyOfRange(array, 1, array.Length);
+        var array = i.ToByteArray(true, true);
+        if (array[0] == 0) array = array.copyOfRange(1, array.Length);
         return array;
     }
 

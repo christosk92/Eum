@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 	    <LangVersion>preview</LangVersion>
@@ -10,9 +10,6 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-      <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-      <PackageReference Include="System.Memory" Version="4.5.5" />
-      <PackageReference Include="System.Runtime.Numerics" Version="4.3.0" />
     </ItemGroup>
 
 </Project>

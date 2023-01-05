@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Numerics;
-using BigInteger = Org.BouncyCastle.Math.BigInteger;
 
 namespace SpotifyTcp.Helpers
 {
@@ -29,7 +28,7 @@ namespace SpotifyTcp.Helpers
         }
         public static byte[] ToByteArray(this BigInteger i)
         {
-            var array = i.ToByteArray();
+            var array = i.ToByteArray(true, true);
             if (array[0] == 0) array = array.copyOfRange(1, array.Length);
             return array;
         }

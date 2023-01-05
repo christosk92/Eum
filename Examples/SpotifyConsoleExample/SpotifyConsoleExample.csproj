@@ -14,6 +14,8 @@
       <ProjectReference Include="..\..\src\Spotify\Eum.Connections.Spotify.VLC\Eum.Connections.Spotify.VLC.csproj" />
       <ProjectReference Include="..\..\src\Spotify\Eum.Connections.Spotify\Eum.Connections.Spotify.csproj" />
       <ProjectReference Include="..\..\src\Spotify\Eum.Protobufs\Eum.Protobufs.csproj" />
+      <ProjectReference Include="..\..\src\Spotify\Players\Eum.Connections.Spotify.NAudio\Eum.Connections.Spotify.NAudio.csproj" />
+      <ProjectReference Include="..\..\src\Spotify\Players\Eum.Connections.Spotify.VLC\Eum.Connections.Spotify.VLC.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,5 +1,7 @@
+
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using Google.Protobuf;
 using Nito.AsyncEx;
@@ -10,7 +12,6 @@ using SpotifyTcp.Helpers;
 using System.Text.Json;
 using Eum.Logging;
 using Eum.Spotify;
-using Org.BouncyCastle.Math;
 using SpotifyTcp.Exceptions;
 using SpotifyTcp.Models;
 
@@ -76,9 +77,9 @@ public sealed class SpotifyTcpClient : ISpotifyTcpClient, IMissingAuthentication
                 .ToByteArray();
 
             // Prevent man-in-the-middle attacks: check server signature
-            var n = new BigInteger(ServerKey)
-                .ToByteArray();
-            var e = BigInteger.ValueOf(65537).ToByteArray();
+            var n = new BigInteger(ServerKey, true, true)
+                .ToByteArray(true, true);
+            var e = new BigInteger(65537).ToByteArray(true, true);
 
             using var rsa = new RSACryptoServiceProvider();
             var rsaKeyInfo = new RSAParameters
