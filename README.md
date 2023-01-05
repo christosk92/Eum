@@ -3,7 +3,9 @@
 
 ## 🤔 Whats is this?
 
-A merged & unified music services library for .NET Standard 2.0 and up.
+A merged & unified music services library for .NET 7.0 and up.
+
+After considering various options, I ultimately chose to use .NET 7 for my project due to its improved performance and the availability of necessary functions in the System.Numerics library.
 
 For [Apple Music](src/Eum.Cores.Apple) & [Spotify](src/Eum.Cores.Spotify).
 
