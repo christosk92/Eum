@@ -27,7 +27,7 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     /// </summary>
     new AuthenticatedSpotifyUser? AuthenticatedUser { get; }
     new SpotifyPrivateUser? PrivateUser { get; }
-
+    IColorLyrics ColorLyrics { get; }
     IViewsClient ViewsClient { get; }
 
     /// <summary>

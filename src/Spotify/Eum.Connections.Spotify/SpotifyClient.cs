@@ -36,7 +36,7 @@ public class SpotifyClient : ISpotifyClient
         IBearerClient bearerClient,
         ISpotifyUsersClient usersClient, 
         SpotifyConfig config, IArtistClient artists, ITracksClient tracks, IAudioKeyManager audioKeyManager, 
-        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, IAlbumsClient albums, IMercurySearchClient search, IViewsClient viewsClient, IExtractedColorsClient colors, ICacheManager? cache = null)
+        ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, IAlbumsClient albums, IMercurySearchClient search, IViewsClient viewsClient, IExtractedColorsClient colors, IColorLyrics colorLyrics, ICacheManager? cache = null)
     {
         BearerClient = bearerClient;
         Users = usersClient;
@@ -55,6 +55,7 @@ public class SpotifyClient : ISpotifyClient
         Search = search;
         ViewsClient = viewsClient;
         Colors = colors;
+        ColorLyrics = colorLyrics;
         Cache = cache;
     }
 
@@ -75,6 +76,7 @@ public class SpotifyClient : ISpotifyClient
         var openArtists = BuildLoggableClient<IOpenArtistClient>(bearer);
         var spClientPlaylists = BuildLoggableClient<ISpClientPlaylists>(bearer);
         var viewsClient = BuildLoggableClient<IViewsClient>(bearer);
+        var lyricsClient = BuildLoggableClient<IColorLyrics>(bearer);
 
         var artists = new ArtistsClientWrapper(new MercuryArtistClient(mercuryClient), openArtists);
 
@@ -103,6 +105,7 @@ public class SpotifyClient : ISpotifyClient
             search,
             viewsClient,
             c,
+            lyricsClient,
             cacheManager);
     }
 
@@ -114,7 +117,7 @@ public class SpotifyClient : ISpotifyClient
     public SpotifyPrivateUser? PrivateUser => _user;
     public IViewsClient ViewsClient { get; }
     public CoreType Type => CoreType.Spotify;
-
+    public IColorLyrics ColorLyrics { get; }
     public IUser? AuthenticatedUser => !IsAuthenticated ? null : _user;
 
     public ISpotifyUsersClient Users { get; }
