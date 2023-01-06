@@ -30,6 +30,11 @@ public interface IAudioPlayer
     /// <param name="playbackid">The playback whose volume should be changed.</param>
     /// <param name="volume">The volume value from 0 to 1, inclusive.</param>
     void SetVolume(string playbackid, float volume);
+
+    void ReleaseAll()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public enum PlaybackStateType

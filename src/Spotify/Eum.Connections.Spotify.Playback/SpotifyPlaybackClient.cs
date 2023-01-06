@@ -86,6 +86,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
         if (deviceId == null)
         {
             //play on local device
+            //our functions will automatically switch the correct device
             var skipTo = new object();
             if (trackUri != null && trackIndex != null)
             {
@@ -156,6 +157,13 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
             };
             await Task.Run(async () => await HandlePlay(JsonSerializer.SerializeToElement(data)), ct);
         }
+        else
+        {
+            //else we do a play command on the external device
+            //TODO: Implement external commanding.
+            throw new NotImplementedException();
+        }
+        
     }
 
 
@@ -308,7 +316,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
     public async ValueTask NotActive()
     {
         _events.InactiveSession(false);
-        await _sink.Pause(State.State.PlaybackId, true);
+        _sink.ReleaseAll();
     }
 
     private void StartMetrics(string playbackId, PlaybackMetricsReason reason, int pos)
@@ -328,7 +336,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
             return;
         }
 
-        metric.EndedHow(reason, State.State.PlayOrigin.FeatureIdentifier);
+        metric.EndedHow(reason, State.State.PlayOrigin?.FeatureIdentifier);
         metric.EndInterval(position);
         metric.Update(metrics);
         metric.SendEvents(_spotifyClient, State.Device);

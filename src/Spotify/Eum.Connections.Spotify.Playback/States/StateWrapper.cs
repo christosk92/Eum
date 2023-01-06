@@ -158,7 +158,15 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
 
         InitState(State);
         _device.SetIsActive(false);
-        await _device.UpdateState(PutStateReason.BecameInactive, await _player.Time, State);
+        try
+        {
+            await _device.UpdateState(PutStateReason.BecameInactive, await _player.Time, State);
+        }
+        catch (Exception x)
+        {
+            S_Log.Instance.LogError(x);
+        }
+
         S_Log.Instance.LogInfo("Notified inactivity!");
     }
 

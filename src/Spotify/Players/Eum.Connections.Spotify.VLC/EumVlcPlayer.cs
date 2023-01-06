@@ -44,6 +44,14 @@ public class EumVlcPlayer : IAudioPlayer
         _libVlc = new LibVLC(enableDebugLogs: true);
 
     }
+
+    public void ReleaseAll()
+    {
+        foreach (var kvp in _holders)
+        {
+            Dispose(kvp.Key);
+        }
+    }
     public ValueTask Pause(string playbackId, bool releaseResources)
     {
         if (_holders.TryGetValue(playbackId, out var item))
