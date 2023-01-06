@@ -122,7 +122,7 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
 
     public async ValueTask VolumeChanged()
     {
-        await _device.UpdateState(PutStateReason.VolumeChanged, _player.Time, State);
+        await _device.UpdateState(PutStateReason.VolumeChanged, await _player.Time, State);
     }
 
     public async ValueTask NotActive()
@@ -158,7 +158,7 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
 
         InitState(State);
         _device.SetIsActive(false);
-        await _device.UpdateState(PutStateReason.BecameInactive, _player.Time, State);
+        await _device.UpdateState(PutStateReason.BecameInactive, await _player.Time, State);
         S_Log.Instance.LogInfo("Notified inactivity!");
     }
 
@@ -203,7 +203,7 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
     public async Task Updated()
     {
         UpdateRestrictions();
-        await _device.UpdateState(PutStateReason.PlayerStateChanged, _player.Time,
+        await _device.UpdateState(PutStateReason.PlayerStateChanged, await _player.Time,
             State);
     }
 
@@ -548,41 +548,55 @@ public class StateWrapper : IMessageListener, IDeviceStateHandlerListener
         var trackUri = PlayCommandHelper.GetSkipToTrackUri(ref dataObject);
         var trackIndex = PlayCommandHelper.GetSkipToIndex(ref dataObject);
 
-        try
+        bool foundTrack = false;
+        bool triedUsingUri = false;
+        bool triedUsingUuid = false;
+        bool triedUsingIndex = false;
+        while (!foundTrack)
         {
-            if (!string.IsNullOrEmpty(trackUri))
+            try
             {
-                await _tracksKeeper.InitializeFrom(tracks =>
+                if (!string.IsNullOrEmpty(trackUri) && !triedUsingUri)
                 {
-                    var index = tracks.FindIndex(t => t.HasUri && t.Uri.Equals(trackUri));
-                    return index;
-                }, null, null);
-            }
-            else if (!string.IsNullOrEmpty(trackUid))
-            {
-                await _tracksKeeper.InitializeFrom(tracks =>
+                    //we should fetch the track here, since it can have multiple versions
+
+                    foundTrack = await _tracksKeeper.InitializeFrom(tracks =>
+                    {
+                        var index = tracks?.FindIndex(t => t.HasUri && t.Uri.Equals(trackUri));
+                        return index ?? -1;
+                    }, null, null);
+                    triedUsingUri = true;
+                }
+                else if (!triedUsingUuid && !string.IsNullOrEmpty(trackUid))
                 {
-                    var index = tracks.FindIndex(t => t.HasUid && t.Uid.Equals(trackUid));
-                    return index;
-                }, null, null);
-            }
-            else if (trackIndex != null)
-            {
-                await _tracksKeeper.InitializeFrom(tracks =>
+                    foundTrack = await _tracksKeeper.InitializeFrom(tracks =>
+                    {
+                        var index = tracks.FindIndex(t => t.HasUid && t.Uid.Equals(trackUid));
+                        return index;
+                    }, null, null);
+                    triedUsingUuid = true;
+                }
+                else if (!triedUsingIndex && trackIndex != null)
                 {
-                    if (trackIndex.Value < tracks.Count) return trackIndex.Value;
-                    return -1;
-                }, null, null);
+                    foundTrack = await _tracksKeeper.InitializeFrom(tracks =>
+                    {
+                        if (trackIndex.Value < tracks.Count) return trackIndex.Value;
+                        return -1;
+                    }, null, null);
+                    triedUsingIndex = true;
+                }
+                else
+                {
+                    await _tracksKeeper.InitializeStart();
+                    foundTrack = true;
+                }
             }
-            else
+            catch (Exception x)
             {
+                S_Log.Instance.LogWarning($"Failed to load track, falling back to start. Exception: {x.ToString()}");
                 await _tracksKeeper.InitializeStart();
+                foundTrack = true;
             }
-        }
-        catch (Exception x)
-        {
-            S_Log.Instance.LogWarning($"Failed to load track, falling back to start. Exception: {x.ToString()}");
-            await _tracksKeeper.InitializeStart();
         }
 
         var seekTo = PlayCommandHelper.GetSeekTo(ref dataObject);
@@ -636,9 +650,17 @@ public class PagesLoader
     {
         try
         {
-            await GetPage(currentPage + 1);
+            var tracks = await GetPage(currentPage + 1);
             currentPage++;
-            return true;
+            if (tracks != null)
+            {
+                return true;
+            }
+            else
+            {
+                currentPage = -1;
+                return false;
+            }
         }
         catch (Exception x)
         {
@@ -686,8 +708,25 @@ public class PagesLoader
             _pages[i] = page;
             return tracks;
         }
-
+        else
+        {
+            Debugger.Break();
+        }
         return null;
+    }
+
+    private async Task<List<ContextTrack>> FetchTracks(string url)
+    {
+        var resolveContext = await _spotifyClient
+            .MercuryClient.SendAndReceiveResponseAsync(url);
+        using var jsonDocument = JsonDocument.Parse(resolveContext.Payload);
+        var root = jsonDocument.RootElement;
+        using var tracks = root.GetProperty("tracks")
+            .EnumerateArray();
+
+        var contextTracks = tracks.Select(ProtoUtils.JsonToContextTrack)
+            .ToList();
+        return contextTracks;
     }
 
     private async Task<List<ContextTrack>> ResolvePage(ContextPage page)
@@ -696,9 +735,19 @@ public class PagesLoader
         {
             return page.Tracks.ToList();
         }
-
-        Debugger.Break();
-        return new List<ContextTrack>();
+        if (page.HasPageUrl)
+        {
+            return await FetchTracks(page.PageUrl);
+        }
+        else if (page.HasLoading && page.Loading)
+        {
+            Debugger.Break();
+            throw new NotSupportedException("What does loading even mean?");
+        }
+        else
+        {
+            throw new Exception("Cannot load page, not enough information!");
+        }
     }
 
     public static PagesLoader From(ISpotifyClient session, Context context)

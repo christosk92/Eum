@@ -190,7 +190,10 @@ internal class TracksKeeper
                 throw new ArgumentException();
 
             Tracks.Clear();
-            Tracks.AddRange(await _pages.CurrentPage);
+            if (_pages.CurrentPage != null)
+            {
+                Tracks.AddRange(await _pages.CurrentPage);
+            }
         }
 
         CheckComplete();
@@ -292,13 +295,14 @@ internal class TracksKeeper
     //     EnrichCurrentTrack(getTrack);
     // }
 
-    public async Task InitializeFrom(Func<List<ContextTrack>, int> func, ContextTrack pbCurrentTrack, Queue cmdQueue)
+    public async Task<bool> InitializeFrom(Func<List<ContextTrack>, int> func, ContextTrack pbCurrentTrack, Queue cmdQueue)
     {
         Tracks.Clear();
         _queue.Clear();
-
+        var foundTrack = false;
         while (true)
         {
+            //https://open.spotify.com/track/1kHEuJRasudLhjvnbfc4yS?si=01849fb8f8f144b6
             if (await _pages.NextPage())
             {
                 var newTracks = await _pages.CurrentPage;
@@ -306,12 +310,25 @@ internal class TracksKeeper
                 if (index == -1)
                 {
                     S_Log.Instance.LogWarning("Did not find track. going to next page");
-                    Tracks.AddRange(newTracks);
+                    if (newTracks != null)
+                    {
+                        Tracks.AddRange(newTracks);
+                    }
+
                     continue;
                 }
+                else
+                {
+                    foundTrack = true;
+                }
+
 
                 index += Tracks.Count;
-                Tracks.AddRange(newTracks);
+                if (newTracks != null)
+                {
+                    Tracks.AddRange(newTracks);
+                }
+
                 SetCurrentTrackIndex(index);
                 S_Log.Instance.LogInfo($"initialized current track index: {index}");
                 break;
@@ -320,7 +337,7 @@ internal class TracksKeeper
             {
                 CannotLoadMore = true;
                 UpdateTrackCount();
-                throw new Exception("Couldnt find current track.");
+                return false;
             }
         }
 
@@ -361,6 +378,8 @@ internal class TracksKeeper
             //NextPlayable(false);
             //state.getOptionsBuilder().setRepeatingTrack(repeatTrack);
         }
+
+        return foundTrack;
     }
 
     private void EnrichCurrentTrack(@ContextTrack track)

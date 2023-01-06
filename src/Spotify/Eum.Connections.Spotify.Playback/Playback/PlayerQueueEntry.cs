@@ -115,9 +115,9 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
                 CrossfadeController = new CrossfadeController(PlaybackId, _metadata.Duration
                     , _listener.MetadataFor(Id), _spotifyClient.Config);
 
-                if ((CrossfadeController is {HasAnyFadeOut: true}))
-                    NotifyInstant(INSTANT_PRELOAD,
-                        (int) ((CrossfadeController.FadeOutStartTimeMin() -
+                if ((CrossfadeController is { HasAnyFadeOut: true }))
+                    await NotifyInstant(INSTANT_PRELOAD,
+                        (int)((CrossfadeController.FadeOutStartTimeMin() -
                                 TimeSpan.FromMilliseconds(20).TotalSeconds)));
 
                 _crossfAdeGot.Set();
@@ -155,7 +155,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
     {
         if (playbackHaltedAt == 0) return;
 
-        int duration = (int) (time - playbackHaltedAt);
+        int duration = (int)(time - playbackHaltedAt);
         _listener.PlaybackResumed(this, chunk, duration);
     }
 
@@ -197,11 +197,11 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
 
         var waitForFinish = new AsyncManualResetEvent(false);
 
-        void TrackFinished(object sender, string playbackId)
+        async void TrackFinished(object sender, string playbackId)
         {
             if (playbackId != PlaybackId) return;
 
-            var time2 = _sink.Time(PlaybackId);
+            var time2 = await _sink.Time(PlaybackId);
             S_Log.Instance.LogInfo($"Player time offset is {_metadata.Duration - time2}, id: {PlaybackId}");
             Dispose();
 
@@ -217,7 +217,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         {
             await waitForFinish.WaitAsync(_cancellationTokenSource.Token);
         }
-        catch(Exception x)
+        catch (Exception x)
         {
             S_Log.Instance.LogError($"{this} terminated at waiting for finish.", x);
         }
@@ -246,7 +246,7 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
 
 
     public PlayerMetrics Metrics => new PlayerMetrics(contentMetrics, CrossfadeController, _audioStream);
-    public int Time => _sink.Time(PlaybackId);
+    public ValueTask<int> Time => _sink.Time(PlaybackId);
     public MetadataWrapper Metadata => _metadata;
 
 
@@ -292,18 +292,40 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         _closed = true;
         _spotifyClient = null;
 
+
         try
         {
             _sink?.Dispose(PlaybackId);
-            _audioStream?.Dispose();
-            _cancellationTokenSource?.Cancel();
-            _listener = null;
-            _audioStream = null;
         }
         catch (Exception)
         {
-            //ignored
+
         }
+
+        try
+        {
+            _cancellationTokenSource?.Cancel();
+        }
+        catch (Exception x)
+        {
+
+        }
+        finally
+        {
+            _cancellationTokenSource.Dispose();
+        }
+
+        try
+        {
+            _audioStream?.Dispose();
+        }
+        catch (Exception x)
+        {
+
+        }
+
+        _listener = null;
+        _audioStream = null;
     }
 
     public override string ToString()
@@ -312,11 +334,11 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
         return $"PlayerQueueEntry: {PlaybackId}, track: {_metadata.track?.Name ?? _metadata.episode?.Name}.";
     }
 
-    public void NotifyInstant(int callbackId, int when)
+    public async Task NotifyInstant(int callbackId, int when)
     {
         if (_sink != null)
         {
-            var time = _sink.Time(PlaybackId);
+            var time = await _sink.Time(PlaybackId);
             if (time >= when)
             {
                 _listener.InstantReached(this, callbackId, time);
@@ -364,7 +386,7 @@ public abstract class AbsQueueEntry
         if (Next == null)
         {
             Next = entry;
-            entry.Prev = (PlayerQueueEntry) this;
+            entry.Prev = (PlayerQueueEntry)this;
         }
         else
         {
@@ -409,6 +431,6 @@ public abstract class AbsQueueEntry
             if (tmp != this) tmp?.Clear();
         }
 
-        ((PlayerQueueEntry) this)?.Dispose();
+        ((PlayerQueueEntry)this)?.Dispose();
     }
 }

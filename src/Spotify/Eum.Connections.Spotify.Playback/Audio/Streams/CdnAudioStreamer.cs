@@ -19,12 +19,12 @@ public class CdnAudioStreamer : IDecodedAudioStream, IGeneralWritableStream
     private readonly CdnUrl _cdnUrl;
     private readonly SuperAudioFormat _format;
     private readonly IAudioDecrypt _audioDecrypt;
-    private readonly ICacheHandler? _cacheHandler;
-    private readonly ISpotifyClient _spotifyClient;
+    private ICacheHandler? _cacheHandler;
+    private ISpotifyClient _spotifyClient;
 
     private static readonly int CHUNK_SIZE = AesAudioDecrypt.CHUNK_SIZE;
 
-    private readonly InternalCdnStream _internalStream;
+    private InternalCdnStream _internalStream;
 
     public CdnAudioStreamer(
         ISpotifyClient spotifyClient,
@@ -140,10 +140,10 @@ public class CdnAudioStreamer : IDecodedAudioStream, IGeneralWritableStream
     }
 
     public int Size { get; }
-
+    private int? _decodedLengthOnDispose;
     public AbsChunkedInputStream Stream => _internalStream;
     public SuperAudioFormat Codec => _format;
-    public int DecodedLength => Stream.decodedLength;
+    public int DecodedLength => _decodedLengthOnDispose ?? Stream.decodedLength;
 
     public int DecryptTimeMs()
     {
@@ -203,7 +203,11 @@ public class CdnAudioStreamer : IDecodedAudioStream, IGeneralWritableStream
 
     public void Dispose()
     {
+        _decodedLengthOnDispose = _internalStream.decodedLength;
         _internalStream.Dispose();
+        _internalStream = null;
+        _cacheHandler = null;
+        _spotifyClient = null;
     }
 }
 
@@ -246,10 +250,31 @@ public class InternalCdnStream : AbsChunkedInputStream
         throw new NotImplementedException();
     }
 
+    public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (closed)
+            return 0;
+        if (pos >= Length)
+            return -1;
+
+        //int i = 0;
+
+        int chunk = (int)Math.Floor(pos / (double)AesAudioDecrypt.CHUNK_SIZE);
+        int chunkOff = (int)(pos % AesAudioDecrypt.CHUNK_SIZE);
+
+        await CheckAvailabilityAsync(chunk, true, false, cancellationToken);
+        if (Buffer[chunk] == null)
+            return 0;
+        int copy = Math.Min((Buffer[chunk].Length) - (chunkOff), buffer.Length);
+        Buffer[chunk].AsMemory(chunkOff, copy).CopyTo(buffer);
+        pos += copy;
+        return copy;
+    }
     public override async Task<int> ReadAsync(byte[] b, int off, int len, CancellationToken cancellationToken)
     {
-        if (closed) throw new IOException("Stream is closed!");
-        
+        if (closed)
+            return 0;
+    
         if (off < 0 || len < 0 || len > b.Length - off)
         {
             throw new ArgumentOutOfRangeException();
@@ -258,17 +283,18 @@ public class InternalCdnStream : AbsChunkedInputStream
         {
             return 0;
         }
-        
+    
         if (pos >= Length)
             return -1;
-        
+    
         //int i = 0;
-        
-        int chunk = (int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE);
-        int chunkOff = (int) (pos % AesAudioDecrypt.CHUNK_SIZE);
-        
+    
+        int chunk = (int)Math.Floor(pos / (double)AesAudioDecrypt.CHUNK_SIZE);
+        int chunkOff = (int)(pos % AesAudioDecrypt.CHUNK_SIZE);
+    
         await CheckAvailabilityAsync(chunk, true, false, cancellationToken);
-        
+        if (Buffer[chunk] == null)
+            return 0;
         int copy = Math.Min((Buffer[chunk].Length) - (chunkOff), len);
         Array.Copy(Buffer[chunk], chunkOff,
             b, off, copy);
@@ -276,32 +302,32 @@ public class InternalCdnStream : AbsChunkedInputStream
         return copy;
     }
 
-    public override int Read(Span<byte> buffer)
-    {
-        if (closed)
-            return 0;
-        if (pos >= Length)
-            return -1;
-
-        //int i = 0;
-
-        int chunk = (int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE);
-        int chunkOff = (int) (pos % AesAudioDecrypt.CHUNK_SIZE);
-
-        CheckAvailability(chunk, true, false);
-        if (Buffer[chunk] == null)
-            return 0;
-        int copy = Math.Min((Buffer[chunk].Length) - (chunkOff), buffer.Length);
-        Buffer[chunk].AsSpan(chunkOff, copy).CopyTo(buffer);
-        pos += copy;
-        return copy;
-    }
+    // public override int Read(Span<byte> buffer)
+    // {
+    //     if (closed)
+    //         return 0;
+    //     if (pos >= Length)
+    //         return -1;
+    //
+    //     //int i = 0;
+    //
+    //     int chunk = (int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE);
+    //     int chunkOff = (int) (pos % AesAudioDecrypt.CHUNK_SIZE);
+    //
+    //     CheckAvailability(chunk, true, false);
+    //     if (Buffer[chunk] == null)
+    //         return 0;
+    //     int copy = Math.Min((Buffer[chunk].Length) - (chunkOff), buffer.Length);
+    //     Buffer[chunk].AsSpan(chunkOff, copy).CopyTo(buffer);
+    //     pos += copy;
+    //     return copy;
+    // }
     
     public override int Read(byte[] b, int off, int len)
     {
         if (closed)
             return 0;
-        
+
         if (off < 0 || len < 0 || len > b.Length - off)
         {
             throw new ArgumentOutOfRangeException();
@@ -310,17 +336,17 @@ public class InternalCdnStream : AbsChunkedInputStream
         {
             return 0;
         }
-        
+
         if (pos >= Length)
             return -1;
-        
+
         //int i = 0;
-        
-        int chunk = (int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE);
-        int chunkOff = (int) (pos % AesAudioDecrypt.CHUNK_SIZE);
-        
+
+        int chunk = (int)Math.Floor(pos / (double)AesAudioDecrypt.CHUNK_SIZE);
+        int chunkOff = (int)(pos % AesAudioDecrypt.CHUNK_SIZE);
+
         CheckAvailability(chunk, true, false);
-        if (Buffer[chunk] == null) 
+        if (Buffer[chunk] == null)
             return 0;
         int copy = Math.Min((Buffer[chunk].Length) - (chunkOff), len);
         Array.Copy(Buffer[chunk], chunkOff,

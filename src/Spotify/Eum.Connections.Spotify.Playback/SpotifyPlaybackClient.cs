@@ -80,6 +80,84 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
     public Cluster LatestCluster => State.LatestCluster;
     public event EventHandler<ClusterUpdate>? ClusterChanged;
 
+    public async Task PlayOnDevice(SpotifyId contextId, SpotifyId? trackUri = null, int? trackIndex = null, string? deviceId = null,
+        CancellationToken ct = default)
+    {
+        if (deviceId == null)
+        {
+            //play on local device
+            var skipTo = new object();
+            if (trackUri != null && trackIndex != null)
+            {
+                skipTo = new
+                {
+                    track_uri = trackUri.Value.Uri,
+                    track_index = trackIndex.Value
+                };
+            }
+            else if (trackIndex != null && trackUri == null)
+            {
+                skipTo = new
+                {
+                    track_index = trackIndex.Value
+                };
+            }
+            else if (trackIndex == null && trackUri != null)
+            {
+                skipTo = new
+                {
+                    track_uri = trackUri.Value.Uri,
+                };
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+
+            var data = new
+            {
+                endpoint = "play",
+                context = new
+                {
+                    uri = contextId.Uri,
+                    url = $"context://{contextId.Uri}",
+                    restrictions = new object()
+                },
+                play_origin = new
+                {
+                    feature_identifier = contextId.Type.ToString().ToLower(),
+                    feature_version = "xpui_2022-12-05_1670256197369_abf054a",
+                    referrer_identifier = "now_playing_bar",
+                    device_identifier = _spotifyClient.Config.DeviceId
+                },
+
+                options = new
+                {
+                    always_play_something = false,
+                    skip_to = skipTo,
+                    initially_paused = false,
+                    system_initiated = false,
+                    player_options_override = new object(),
+                    suppressions = new object(),
+                    prefetch_level = "none",
+                    audio_stream = "default",
+                    session_id = string.Empty,
+                    license = "premium"
+                },
+                play_options = new
+                {
+                    override_restrictions = false,
+                    only_for_local_device = false,
+                    system_initiated = false,
+                    reason = "interactive",
+                    operation = "replace",
+                    trigger = "immediately"
+                }
+            };
+            await Task.Run(async () => await HandlePlay(JsonSerializer.SerializeToElement(data)), ct);
+        }
+    }
+
 
     /// <summary>
     /// Enter a "panic" state where everything is stopped.
@@ -109,17 +187,17 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
     public StateWrapper State { get; private set; }
     public MetadataWrapper CurrentMetadata { get; }
 
-    public int Time
+    public ValueTask<int> Time
     {
         get
         {
             try
             {
-                return _playerSession == null ? -1 : _playerSession.CurrentTime;
+                return _playerSession?.CurrentTime ?? new ValueTask<int>(-1);
             }
             catch (CannotGetTimeException ex)
             {
-                return -1;
+                return new ValueTask<int>(-1);
             }
         }
     }
@@ -508,7 +586,7 @@ public class SpotifyPlaybackClient : ISpotifyPlaybackClient, IDeviceStateHandler
             await _sink.Pause(State.State.PlaybackId, false);
 
             if (_playerSession != null)
-                State.SetPosition(_playerSession.CurrentTime);
+                State.SetPosition(await _playerSession.CurrentTime);
 
 
             await State.Updated();

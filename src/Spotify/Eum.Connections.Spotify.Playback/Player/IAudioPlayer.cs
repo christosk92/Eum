@@ -14,7 +14,7 @@ public interface IAudioPlayer
         string playbackId, 
         long playFrom);
 
-    int Time(string playbackId);
+    ValueTask<int> Time(string playbackId);
     void Dispose(string playbackId);
     void Seek(string playbackId, int posInMs);
 

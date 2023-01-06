@@ -215,7 +215,7 @@ public class MercuryTracksClient : IMercuryTracksClient
 
     public async Task<Track> GetTrack(string hexid, string country, CancellationToken ct = default)
     {
-        var send = await _mercuryClient.SendAndReceiveResponseAsync($"hm://metadata/4/track/{hexid}?market=from_token&country={country}", MercuryRequestType.Get,
+        var send = await _mercuryClient.SendAndReceiveResponseAsync($"hm://metadata/4/track/{hexid}?country={country}", MercuryRequestType.Get,
             ct);
         if (send.StatusCode >= 200 && send.StatusCode < 300)
             return Track.Parser.ParseFrom(send.Payload.Span);

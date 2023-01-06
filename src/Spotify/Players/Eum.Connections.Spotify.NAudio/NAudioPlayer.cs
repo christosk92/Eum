@@ -137,14 +137,14 @@ public class NAudioPlayer : IAudioPlayer
         }
     }
 
-    public int Time(string playbackId)
+    public ValueTask<int> Time(string playbackId)
     {
         if (_holders.TryGetValue(playbackId, out var item))
         {
-            return (int) item.Reder.CurrentTime.TotalMilliseconds;
+            return new ValueTask<int>((int)item.Reder.CurrentTime.TotalMilliseconds);
         }
 
-        return -1;
+        return new ValueTask<int>(-1);
     }
 
     public void Dispose(string playbackId)

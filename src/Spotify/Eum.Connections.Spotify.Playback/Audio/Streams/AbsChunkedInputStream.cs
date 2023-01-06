@@ -68,13 +68,12 @@ public abstract class AbsChunkedInputStream : Stream, IHaltListener
         if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
         if (closed)
         {
-            var name = TrackName;
             return 0;
         }
-        if (offset == 0)
-            offset += 0xa7;
         //offset += 0xa7;
-        pos = offset;
+        //if (offset == 0)
+          //  offset += 0xa7;
+        pos = offset + 0xa7;
 
         CheckAvailability((int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE), false, false);
         return pos;

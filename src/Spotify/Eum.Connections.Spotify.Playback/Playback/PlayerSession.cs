@@ -42,7 +42,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
 
     public async void PlaybackEnded(PlayerQueueEntry entry)
     {
-        _listener.TrackPlayed(entry.PlaybackId, entry.EndReason, entry.Metrics, entry.Time);
+        _listener.TrackPlayed(entry.PlaybackId, entry.EndReason, entry.Metrics, await entry.Time);
 
         if (entry == _queue.Head)
             await Advance(PlaybackMetricsReason.TRACK_DONE);
@@ -139,11 +139,11 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
     public string? CurrentPlaybackId => _queue?.Head?.PlaybackId;
     public PlayerMetrics? CurrentMetrics => _queue?.Head?.Metrics;
 
-    public int CurrentTime
+    public ValueTask<int> CurrentTime
     {
         get
         {
-            if (_queue.Head == null) return -1;
+            if (_queue.Head == null) return new ValueTask<int>(-1);
             else return _queue.Head.Time;
         }
     }
@@ -160,7 +160,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
         _listener = null;
     }
 
-    private void Add(SpotifyId id, bool preloaded, bool play, long playFrom)
+    private async Task Add(SpotifyId id, bool preloaded, bool play, long playFrom)
     {
         var entry = new PlayerQueueEntry(_sink, _spotifyClient, id, preloaded, this, play, playFrom);
         _queue.Add(entry);
@@ -175,7 +175,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
                 if ((fadeOut = head.CrossfadeController.SelectFadeOut(PlaybackMetricsReason.TRACK_DONE, customFade)) !=
                     null)
                 {
-                    head.NotifyInstant(PlayerQueueEntry.INSTANT_START_NEXT, fadeOut.Start);
+                    await head.NotifyInstant(PlayerQueueEntry.INSTANT_START_NEXT, fadeOut.Start);
                 }
             }
         }
@@ -186,7 +186,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
     {
         var playable = await _listener.NextPlayableDoNotSet();
         if (playable != null)
-            Add(playable.Value, true, true, 0);
+            await Add(playable.Value, true, true, 0);
     }
 
     private bool AdvanceTo(SpotifyId id)
@@ -233,7 +233,7 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
 
         if (!AdvanceTo(spotifyId))
         {
-            Add(spotifyId, false, play, pos);
+            await Add(spotifyId, false, play, pos);
             _queue.Advance();
         }
 
@@ -266,13 +266,13 @@ internal class PlayerSession : IPlayerQueueEntryListener, IDisposable
                     {
                         case PartialFadeInterval:
                         {
-                            int time = head.Prev.Time;
-                            head.Prev.NotifyInstant(PlayerQueueEntry.INSTANT_END,
+                            int time = await head.Prev.Time;
+                            await head.Prev.NotifyInstant(PlayerQueueEntry.INSTANT_END,
                                 fadeOut.Start);
                             break;
                         }
                         default:
-                            head.Prev.NotifyInstant(PlayerQueueEntry.INSTANT_END, fadeOut.End);
+                            await head.Prev.NotifyInstant(PlayerQueueEntry.INSTANT_END, fadeOut.End);
                             break;
                     }
                 }

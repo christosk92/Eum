@@ -34,7 +34,7 @@ public static class CdnFeedHelper
         var streamer = cdnManager.StreamFile(haltListener, track.Name);
         //TODO: Normalization
         object normalizationData = null;
-        if(streamer.Stream.Seek(0xa7, SeekOrigin.Begin) != 0xa7) throw new Exception("Seek failed");
+        //if(streamer.Stream.Seek(0xa7, SeekOrigin.Begin) != 0xa7) throw new Exception("Seek failed");
 
         return new LoadedStream(track, streamer, normalizationData,
             new PlayableContentMetrics(file.FileId, preload, preload ? -1 : audiokeyTime), new MetadataWrapper(track, null));
