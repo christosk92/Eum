@@ -1,6 +1,7 @@
 using Eum.Connections.Spotify.Cache;
 using Eum.Connections.Spotify.Clients;
 using Eum.Connections.Spotify.Clients.Contracts;
+using Eum.Connections.Spotify.Connection;
 using Eum.Connections.Spotify.Connection.Authentication;
 using Eum.Connections.Spotify.Exceptions;
 using Eum.Connections.Spotify.Helpers;
@@ -103,4 +104,9 @@ public interface ISpotifyClient : IMusicCore, IDisposable
     /// <returns>The authenticated user. Also <see cref="AuthenticatedUser"/></returns>
     Task<AuthenticatedSpotifyUser?> 
         AuthenticateAsync(ISpotifyAuthentication authentication);
+
+    ISpotifyConnectionProvider ConnectionProvider { get; }
+
+
+    IObservable<IReadOnlyList<CollectionUpdate>>? CollectionUpdate { get; }
 }

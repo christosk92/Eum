@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reactive.Subjects;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,10 +33,10 @@ public class SpotifyClient : ISpotifyClient
     private SpotifyPrivateUser? _user = null;
     private readonly ISpotifyConnectionProvider _spotifyConnectionProvider;
 
-    public SpotifyClient(ISpotifyConnectionProvider connectionProvider, 
+    public SpotifyClient(ISpotifyConnectionProvider connectionProvider,
         IBearerClient bearerClient,
-        ISpotifyUsersClient usersClient, 
-        SpotifyConfig config, IArtistClient artists, ITracksClient tracks, IAudioKeyManager audioKeyManager, 
+        ISpotifyUsersClient usersClient,
+        SpotifyConfig config, IArtistClient artists, ITracksClient tracks, IAudioKeyManager audioKeyManager,
         ITimeProvider timeProvider, ISpotifyConnectClient websocketState, IMercuryClient mercuryClient, IEventService eventService, IOpenPlaylistsClient openApiPlaylists, ISpClientPlaylists spClientPlaylists, IAlbumsClient albums, IMercurySearchClient search, IViewsClient viewsClient, IExtractedColorsClient colors, IColorLyrics colorLyrics, ICacheManager? cache = null)
     {
         BearerClient = bearerClient;
@@ -57,8 +58,9 @@ public class SpotifyClient : ISpotifyClient
         Colors = colors;
         ColorLyrics = colorLyrics;
         Cache = cache;
-    }
 
+        _spotifyConnectionProvider.NewConnection += SpotifyConnectionProviderOnNewConnection;
+    }
 
     /// <summary>
     /// Initialize a new <see cref="ISpotifyClient"/> with a single config file.
@@ -70,7 +72,7 @@ public class SpotifyClient : ISpotifyClient
         var holder = new SpotifyConnectionProvider(config);
         var mercuryClient = new MercuryClient(holder);
         var bearer = new MercuryBearerClient(mercuryClient);
-        
+
         var users = BuildLoggableClient<ISpotifyUsersClient>(bearer);
         var playlists = BuildLoggableClient<IOpenPlaylistsClient>(bearer);
         var openArtists = BuildLoggableClient<IOpenArtistClient>(bearer);
@@ -92,12 +94,12 @@ public class SpotifyClient : ISpotifyClient
 
         var timeProvider = new TimeProvider(config, bearer);
         var albumsClientWrapper = new AlbumsCLientWrapper(new MercuryAlbumClient(mercuryClient));
-        
+
         var websocketState = new SpotifyConnectClient(new SpotifyWebSocket(bearer), bearer);
         var search = new MercurySearchClient(mercuryClient);
         var c = new ExtractedColorClient(bearer);
-        return new SpotifyClient(holder, bearer, users,  
-            config, artists, tracks, audioKeyManager, 
+        return new SpotifyClient(holder, bearer, users,
+            config, artists, tracks, audioKeyManager,
             timeProvider, websocketState, mercuryClient,
             new EventService(mercuryClient, timeProvider), playlists,
             spClientPlaylists,
@@ -109,7 +111,7 @@ public class SpotifyClient : ISpotifyClient
             cacheManager);
     }
 
-    public bool IsAuthenticated => 
+    public bool IsAuthenticated =>
         _spotifyConnectionProvider.IsConnected && _spotifyConnectionProvider.GetCurrentUser() != null;
 
     public event EventHandler<AuthenticatedSpotifyUser>? Authenticated;
@@ -164,12 +166,36 @@ public class SpotifyClient : ISpotifyClient
         return _spotifyConnectionProvider.GetCurrentUser();
     }
 
+    private void SpotifyConnectionProviderOnNewConnection(object? sender,
+        (ISpotifyConnection? Old, ISpotifyConnection? New) e)
+    {
+        if (e.Old != null)
+        {
+            e.Old.CollectionUpdate -= OnCollectionUpdate;
+        }
+
+        if (e.New != null)
+        {
+            e.New.CollectionUpdate += OnCollectionUpdate;
+        }
+    }
+
+    private void OnCollectionUpdate(object? sender, IReadOnlyList<CollectionUpdate> e)
+    {
+        _collectionUpdateSubj.OnNext(e);
+    }
+
+
+    public ISpotifyConnectionProvider ConnectionProvider => _spotifyConnectionProvider;
+    private readonly Subject<IReadOnlyList<CollectionUpdate>> _collectionUpdateSubj = new();
+    public IObservable<IReadOnlyList<CollectionUpdate>> CollectionUpdate => _collectionUpdateSubj;
+
     public void Dispose()
     {
         _spotifyConnectionProvider.Dispose();
     }
-    
-    
+
+
     private static T BuildLoggableClient<T>(IBearerClient bearerClient)
     {
         var type = typeof(T);
@@ -242,53 +268,53 @@ public class SpotifyConfig
     /// A bool indicating if the should retry a chunk if it fails. Default is true.
     /// </summary>
     public bool RetryOnChunkError { get; set; } = true;
-    
+
     /// <summary>
     /// The path to the cache folder. If this is null, no caching will be done.
     /// </summary>
     public string? CachePath { get; init; }
-    
+
     /// <summary>
     /// The initial volume of the player. Default is MAX_VOLUME / 2.
     /// </summary>
     public uint InitialVolume { get; init; } = 65536 / 2;
-    
+
     /// <summary>
     /// The name of the device. Default is "Eum Desktop".
     /// </summary>
     public string DeviceName { get; init; } = "Eum Desktop";
-    
+
     /// <summary>
     /// The type of the device. Default is "Computer".
     /// </summary>
     public DeviceType DeviceType { get; init; } = DeviceType.Computer;
-    
+
     /// <summary>
     /// The step size of the volume. Default is VOLUME_MAX / 100.
     /// </summary>
     public int VolumeSteps { get; init; } = 64;
-    
+
     /// <summary>
     /// Type of <see cref="TimeSyncMethod"/>. Default is <see cref="TimeSyncMethod.MELODY"/>. 
     /// </summary>
     public TimeSyncMethod TimeSyncMethod { get; init; } = TimeSyncMethod.MELODY;
-    
+
     /// <summary>
     /// Whenever <see cref="TimeSyncMethod"/> is set to <see cref="TimeSyncMethod.Manual"/>, this is the offset that will be used.
     /// </summary>
     public long TimeManualCorrection { get; set; }
-    
+
     /// <summary>
     /// Preferred bitrate.
     /// </summary>
     public AudioQuality AudioQuality { get; set; }
-    
-    
+
+
     /// <summary>
     /// Normalize the volume of the audio. Default is false.
     /// </summary>
     public bool Normalization { get; set; }
-    
+
     /// <summary>
     /// Whenever there's nothing left to play, the player will automatically start playing a new feed from Spotify. Default is true.
     /// </summary>
@@ -306,7 +332,7 @@ public class SpotifyConfig
 }
 
 
-public enum TimeSyncMethod  
+public enum TimeSyncMethod
 {
     /// <summary>
     /// Measure the time between sending and receiving a request to an NTP server.

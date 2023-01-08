@@ -59,6 +59,7 @@ public class SpotifyConnectionProvider : ISpotifyConnectionProvider
             var user = await client.ConnectAsync(ct);
 
             _previousAuthenticator = authenticator;
+            NewConnection?.Invoke(this, (_spotifyConnectionHolder?.Connection, client));
             _spotifyConnectionHolder = new SpotifyConnectionHolder
             {
                 Connection = client,
@@ -68,6 +69,8 @@ public class SpotifyConnectionProvider : ISpotifyConnectionProvider
             return client;
         }
     }
+
+    public event EventHandler<(ISpotifyConnection? Old, ISpotifyConnection? New)>? NewConnection;
 
     public void Dispose()
     {

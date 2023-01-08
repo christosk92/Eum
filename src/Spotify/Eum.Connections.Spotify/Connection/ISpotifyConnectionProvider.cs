@@ -21,4 +21,6 @@ public interface ISpotifyConnectionProvider : IDisposable
     /// <returns></returns>
     ValueTask<ISpotifyConnection?> GetConnectionAsync(ISpotifyAuthentication? authenticator = null,
         CancellationToken ct = default);
+
+    event EventHandler<(ISpotifyConnection? Old, ISpotifyConnection? New)> NewConnection;
 }

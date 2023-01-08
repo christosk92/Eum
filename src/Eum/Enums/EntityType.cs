@@ -11,5 +11,6 @@ public enum EntityType
     Playlist =7, 
     Collection =8,
     User = 9,
-    Local = 10
+    Local = 10,
+    Device = 11
 }

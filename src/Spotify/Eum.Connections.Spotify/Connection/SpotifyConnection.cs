@@ -4,14 +4,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Eum.Connections.Spotify.Connection.Authentication;
 using Eum.Connections.Spotify.Exceptions;
 using Eum.Connections.Spotify.Helpers;
+using Eum.Connections.Spotify.Models.Library;
 using Eum.Connections.Spotify.Models.Users;
 using Eum.Logging;
 using Eum.Spotify;
@@ -123,6 +126,9 @@ public class SpotifyConnection : ISpotifyConnection
         }
         KeyReceived += OnPacketReceived;
     }
+
+
+    public event EventHandler<IReadOnlyList<CollectionUpdate>> CollectionUpdate;
 
 
     private readonly AsyncManualResetEvent _waitForProductInfo = new AsyncManualResetEvent(false);
@@ -266,7 +272,7 @@ public class SpotifyConnection : ISpotifyConnection
                             case MercuryPacketType.MercuryUnsub:
                             case MercuryPacketType.MercuryEvent:
                                 //Handle mercury packet..
-                                Task.Run(() =>
+                                _ =Task.Run(() =>
                                 {
                                     var sw = Stopwatch.StartNew();
                                     using var stream = new MemoryStream(payload);
@@ -362,6 +368,45 @@ public class SpotifyConnection : ISpotifyConnection
                                             break;
                                         case MercuryPacketType.MercuryEvent:
                                             //Debug.WriteLine();
+                                            //hm://collection/collection/7ucghdgquf6byqusqkliltwc2/json
+                                            //{"items":[{"type":"track","unheard":false,"addedAt":1673175654,"removed":false,"identifier":"62XmbJHgLkBQZOT5SJMGA1"}]}
+                                            if (header.HasUri && (header.Uri ==
+                                                    $"hm://collection/collection/{_authenticatedSpotifyUser.Username}/json" || header.Uri ==
+                                                    $"hm://collection/artist/{_authenticatedSpotifyUser.Username}/json"
+                                                    || header.Uri == $"hm://collection/show/{_authenticatedSpotifyUser.Username}/json"))
+                                            {
+                                                S_Log.Instance.LogInfo(
+                                                    $"[{seq}]: Collection update for {header.Uri}..");
+                                                //probably collection update
+                                                using var jsonDoc =
+                                                    JsonDocument.Parse(partial.Skip(1).SelectMany(a => a).ToArray());
+                                                using var items = jsonDoc.RootElement.GetProperty("items")
+                                                    .EnumerateArray();
+                                                var adaptedItems = items.Select(a =>
+                                                {
+                                                    var identifier = a.GetProperty("identifier").GetString();
+                                                    var type = JsonStringEnumConverterWithSpan.ToType(
+                                                        a.GetProperty("type").GetString());
+                                                    if (a.GetProperty("removed").GetBoolean())
+                                                    {
+                                                        return new CollectionUpdate
+                                                        {
+                                                            Removed = true,
+                                                            Id = SpotifyId.With(identifier, type)
+                                                        };
+                                                    }
+                                                    else
+                                                    {
+                                                        return new CollectionUpdate
+                                                        {
+                                                            Removed = false,
+                                                            AddedAt = DateTimeOffset.FromUnixTimeSeconds(a.GetProperty("addedAt").GetInt64()),
+                                                            Id = SpotifyId.With(identifier, type)
+                                                        };
+                                                    }
+                                                });
+                                                CollectionUpdate?.Invoke(this, adaptedItems.ToArray());
+                                            }
                                             break;
                                         default:
                                             Debugger.Break();

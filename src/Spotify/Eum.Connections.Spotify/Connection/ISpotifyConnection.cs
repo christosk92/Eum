@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Eum.Connections.Spotify.Exceptions;
@@ -36,4 +37,14 @@ public interface ISpotifyConnection : IDisposable
 
     void RegisterMercuryCallback(int sequence, Action<MercuryResponse> action);
     void RegisterKeyCallback(int sequence, Action<AesKeyResponse> action);
+
+    event EventHandler<IReadOnlyList<CollectionUpdate>>? CollectionUpdate;
+}
+
+public sealed class CollectionUpdate
+{
+    //{"items":[{"type":"track","unheard":false,"addedAt":0,"removed":true,"identifier":"0QPYn15U8IQHKcH2LDfrek"},{"type":"track","unheard":false,"addedAt":0,"removed":true,"identifier":"2FRnf9qhLbvw8fu4IBXx78"}]}
+    public SpotifyId Id { get; internal init; }
+    public bool Removed { get; init; }
+    public DateTimeOffset? AddedAt { get; init; }
 }

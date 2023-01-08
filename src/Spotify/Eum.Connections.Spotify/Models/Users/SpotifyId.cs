@@ -221,7 +221,12 @@ public readonly struct SpotifyId : IComparable<SpotifyId>, IEquatable<SpotifyId>
         Type = track;
         IsValidId = true;
     }
-
+    public static SpotifyId FromHex(string hex, EntityType type)
+    {
+        var k = _base62.Encode(hex.HexToBytes());
+        var j = $"spotify:{type.ToString().ToLower()}:" + Encoding.Default.GetString(k);
+        return new SpotifyId(j);
+    }
     public bool IsValidId { get; }
     public bool IsLocalId { get; }
 
