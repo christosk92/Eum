@@ -28,7 +28,9 @@ public class VorbisHolder
     public Media Media { get; }
     public StreamMediaInput MediaInput { get; }
     public MediaPlayer Player { get; }
+
     public AbsChunkedInputStream Stream { get; }
+    public float PreviousGain { get; set; }
 
     public CancellationTokenSource _CancellationToken;
 }
@@ -75,10 +77,27 @@ public class EumVlcPlayer : IAudioPlayer
     {
         if (_holders.TryGetValue(playbackId, out var state))
         {
-            //I want to crossfade the audio here, that means i need to change the gain of the current playback
-            //we need to use the state.media.addoption
-
-            // state.Media.AddOption($":audio-filter=volume:gain={getGain}");
+            //TODO:
+            // if (Math.Abs(getGain - state.PreviousGain) > 0.001)
+            // {
+            //     //check if decreased or increased
+            //     if (getGain - state.PreviousGain > 0)
+            //     {
+            //         //increase 
+            //         //so new track
+            //         var equalizer = new Equalizer();
+            //         equalizer.SetPreamp(-20 * (1 - getGain));
+            //         state.Player.SetEqualizer(equalizer);
+            //     }
+            //     else
+            //     {
+            //         var equalizer = new Equalizer();
+            //         equalizer.SetPreamp(-20 * getGain);
+            //         state.Player.SetEqualizer(equalizer);
+            //     }
+            //
+            //     state.PreviousGain = getGain;
+            // }
         }
     }
 
@@ -113,9 +132,6 @@ public class EumVlcPlayer : IAudioPlayer
             // var waveOut = new WaveOutEvent();
             var newHolder = new VorbisHolder(media, player, streammediaInput, audioStreamStream);
             _holders[playbackId] = newHolder;
-            var d =
-                media.Duration;
-
             async void playing(object? sender, EventArgs eventArgs)
             {
                 try

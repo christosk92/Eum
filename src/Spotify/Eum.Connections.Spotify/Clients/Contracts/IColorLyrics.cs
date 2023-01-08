@@ -28,7 +28,7 @@ namespace Eum.Connections.Spotify.Clients.Contracts
     {
         [JsonPropertyName("syncType")]
         public string SyncType { get; init; }
-        public LyricsLine[] Lines { get; init; }
+        public LyricsLine[]? Lines { get; init; }
     }
 
     public class LyricsLine
@@ -42,6 +42,7 @@ namespace Eum.Connections.Spotify.Clients.Contracts
     {
         public override double Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
+            if (reader.TokenType is JsonTokenType.Number) return reader.GetDouble();
             var str = reader.GetString();
             if (double.TryParse(str, out var r))
                 return r;

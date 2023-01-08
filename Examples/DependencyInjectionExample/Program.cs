@@ -11,7 +11,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         services.AddAppleMusicCore(new DeveloperTokenConfiguration
             {
-                DefaultStorefrontId = "kr",
+                DefaultStorefrontId = "us",
                 KeyId = "C3CXXG89R7",
                 TeamId = "QF7THUQ8VL",
                 PathToFile = "authkey.p8"

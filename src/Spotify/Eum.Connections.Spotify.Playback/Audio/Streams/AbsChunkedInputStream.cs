@@ -71,9 +71,9 @@ public abstract class AbsChunkedInputStream : Stream, IHaltListener
             return 0;
         }
         //offset += 0xa7;
-        //if (offset == 0)
-          //  offset += 0xa7;
-        pos = offset + 0xa7;
+        if (offset == 0)
+            offset += 0xa7;
+        pos = offset;
 
         CheckAvailability((int) Math.Floor(pos / (double) AesAudioDecrypt.CHUNK_SIZE), false, false);
         return pos;

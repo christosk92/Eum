@@ -185,13 +185,13 @@ public class PlayerQueueEntry : AbsQueueEntry, IHaltListener, IDisposable
             if (_notifyInstatns.Any()) CheckInstants(e.time);
             if (CrossfadeController != null)
             {
-                _audioStream.Stream.Gain(CrossfadeController.GetGain(e.time));
-                //_sink.Gain(PlaybackId, CrossfadeController.GetGain(e.time));
+                //_audioStream.Stream.Gain(CrossfadeController.GetGain(e.time));
+                _sink.Gain(PlaybackId, CrossfadeController.GetGain(e.time));
             }
             else
             {
-                _audioStream.Stream.Gain(1f);
-                //_sink.Gain(PlaybackId, 1f);
+                //_audioStream.Stream.Gain(1f);
+                _sink.Gain(PlaybackId, 1f);
             }
         }
 

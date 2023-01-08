@@ -25,7 +25,6 @@ public class CdnAudioStreamer : IDecodedAudioStream, IGeneralWritableStream
     private static readonly int CHUNK_SIZE = AesAudioDecrypt.CHUNK_SIZE;
 
     private InternalCdnStream _internalStream;
-
     public CdnAudioStreamer(
         ISpotifyClient spotifyClient,
         ByteString fileId,
