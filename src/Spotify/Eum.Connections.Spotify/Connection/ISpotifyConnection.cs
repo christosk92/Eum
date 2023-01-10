@@ -44,7 +44,7 @@ public interface ISpotifyConnection : IDisposable
 public sealed class CollectionUpdate
 {
     //{"items":[{"type":"track","unheard":false,"addedAt":0,"removed":true,"identifier":"0QPYn15U8IQHKcH2LDfrek"},{"type":"track","unheard":false,"addedAt":0,"removed":true,"identifier":"2FRnf9qhLbvw8fu4IBXx78"}]}
-    public SpotifyId Id { get; internal init; }
+    public SpotifyId Id { get; init; }
     public bool Removed { get; init; }
     public DateTimeOffset? AddedAt { get; init; }
 }
